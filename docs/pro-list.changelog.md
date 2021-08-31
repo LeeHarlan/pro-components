@@ -9,6 +9,60 @@ group:
 
 # Change Log
 
+## @ant-design/pro-list@1.11.0
+
+`2021-08-03`
+
+- 💥 feat(list): ProList add base proList [#3361](https://github.com/ant-design/pro-components/pull/3361) [@chenshuai2144](https://github.com/chenshuai2144)
+
+## @ant-design/pro-list@1.10.11
+
+`2021-07-30`
+
+- 🐛 fix(list): better snapshot update style [#3338](https://github.com/ant-design/pro-components/pull/3338) [@chenshuai2144](https://github.com/chenshuai2144)
+
+## @ant-design/pro-list@1.10.9
+
+`2021-07-21`
+
+## @ant-design/pro-list@1.10.8
+
+`2021-07-20`
+
+- 🐛 fix(list): fix form context no render error [#3274](https://github.com/ant-design/pro-components/pull/3274) [@chenshuai2144](https://github.com/chenshuai2144)
+
+## @ant-design/pro-list@1.10.7
+
+`2021-07-19`
+
+- 🎨 chore(list): update depend rc-resize-observer [#3206](https://github.com/ant-design/pro-components/pull/3206) [@DerrickTel](https://github.com/DerrickTel)
+
+## @ant-design/pro-list@1.10.2
+
+`2021-06-23`
+
+- 🐛 fix(prolist): title&description wordBreak [#3059](https://github.com/ant-design/pro-components/pull/3059) [@binvb](https://github.com/binvb)
+- 🐛 fix(list):fix itemTitleRender no work error [#3069](https://github.com/ant-design/pro-components/pull/3069) [@chenshuai2144](https://github.com/chenshuai2144)
+
+## @ant-design/pro-list@1.8.0
+
+`2021-05-25`
+
+- 💥 feat(list): prolist support itemHeaderRender [#2844](https://github.com/ant-design/pro-components/pull/2844) [@chenshuai2144](https://github.com/chenshuai2144)
+- 💥 feat(list): list support locale(#2828) [#2840](https://github.com/ant-design/pro-components/pull/2840) [@DerrickTel](https://github.com/DerrickTel)
+
+## @ant-design/pro-list@1.7.4
+
+`2021-05-18`
+
+- 🐛 fix(list): add editable props types [#2758](https://github.com/ant-design/pro-components/pull/2758) [@chenshuai2144](https://github.com/chenshuai2144)
+
+## @ant-design/pro-list@1.7.0
+
+`2021-04-22`
+
+- 💥 feat(list): support onRow [#2543](https://github.com/ant-design/pro-components/pull/2543) [@DerrickTel](https://github.com/DerrickTel)
+
 ## @ant-design/pro-list@1.6.0
 
 `2021-04-15`

@@ -57,6 +57,9 @@ const columns: ProFormColumnsType<DataItem>[] = [
     valueType: 'date',
   },
   {
+    valueType: 'divider',
+  },
+  {
     title: '分组',
     valueType: 'group',
     columns: [
@@ -161,6 +164,7 @@ export default () => {
   return (
     <>
       <ProFormSelect
+        label="布局方式"
         options={['ProForm', 'ModalForm', 'DrawerForm', 'LightFilter', 'QueryFilter']}
         fieldProps={{
           value: layoutType,

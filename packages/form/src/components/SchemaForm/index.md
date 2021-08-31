@@ -8,9 +8,31 @@ nav:
   path: /components
 ---
 
-# JSON 表单
+# Schema Form - JSON 表单
 
 SchemaForm 是根据 JSON Schema 来生成表单的工具。SchemaForm 会根据 valueType 来映射成不同的[表单项](/components/schema)。
+
+## API
+
+SchemaForm 提供了与 [ProForm](/components/form#proform) 相同的 API，并且增加了部分 API，以下的 SchemaForm 新增的 API。
+
+| 字段名称 | 类型 | 说明 |
+| --- | --- | --- |
+| `layoutType` | [`ProFormLayoutType`](/components/schema-form#proformlayouttype) | 使用的表单布局模式 |
+| `steps` | `StepFormProps[]` | `layoutType=steps`中的分布表单配置，需要配置 columns 为数组使用 |
+| `columns` | [`ProFormColumnsType` \| `ProFormColumnsType[]`](/components/schema-form#schema-定义) | 表单的定义，一般是 json 对象，如果是分布表单，需要使用 json 数组来生成多个表单 |
+
+## ProFormLayoutType
+
+| 字段名称 | 说明 |
+| --- | --- |
+| `Form` | [ProForm](/components/form) 是基本的表单类型 |
+| `ModalForm` | 弹框表单，配置之后支持 [ModalForm](/components/modal-form) 的所有配置 |
+| `DrawerForm` | 抽屉表单，配置之后支持 [DrawerForm](/components/modal-form) 的所有配置 |
+| `StepsForm`\|`StepForm` | 配置之后为分步表单，有两种模式一种使用 `steps` 和 `columns` 来生成，一种是通过 `layoutType=StepsForm` 嵌套 `layoutType=StepForm` 来实现 |
+| `LightFilter` | 轻量筛选，配置之后支持 [`LightFilter`](/components/query-filter) 的所有配置 |
+| `QueryFilter` | 查询表单，配置之后支持 [`QueryFilter`](/components/query-filter) 的所有配置 |
+| `Embed` | 内嵌模式，只生成表单项，不生成 Form 可以混合使用 |
 
 ## Schema 定义
 
@@ -26,6 +48,7 @@ SchemaForm 表单最重要就是 Schema 的类型定义，我们使用了与 tab
 | `valueEnum` | `(Entity)=> ValueEnum` \| `ValueEnum` | 支持 object 和 Map，Map 是支持其他基础类型作为 key |
 | `fieldProps` | `(form,config)=>fieldProps`\| `fieldProps` | 传给渲染的组件的 props，自定义的时候也会传递 |
 | `formItemProps` | `(form,config)=>formItemProps` \| `formItemProps` | 传递给 Form.Item 的配置 |
+| `proFieldProps` | `proFieldProps` | 设置到 `ProField` 上面的 `props`，内部属性 |
 | `renderText` | `(text: any, record: Entity, index: number, action: ProCoreActionType) => any` | 修改的数据是会被 valueType 定义的渲染组件消费 |
 | `render` | `(dom,entity,index, action, schema) => React.ReactNode` | 自定义只读模式的 dom,`render` 方法只管理的只读模式，编辑模式需要使用 `renderFormItem` |
 | `renderFormItem` | `(schema,config,form) => React.ReactNode` | 自定义编辑模式,返回一个 ReactNode，会自动包裹 value 和 onChange |
@@ -41,3 +64,11 @@ SchemaForm 表单最重要就是 Schema 的类型定义，我们使用了与 tab
 ### JSON 来生成表单
 
 <code src="./demos/schema.tsx" height="764px" title="schema 表单" />
+
+### JSON 来生成分布表单
+
+<code src="./demos/steps-form.tsx" height="464px" title="schema 表单" />
+
+### 嵌入到 ProForm 中
+
+<code src="./demos/embed.tsx" height="464px" title="schema 表单" />

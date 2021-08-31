@@ -21,6 +21,8 @@ import type { OptionConfig, ToolBarProps } from './components/ToolBar';
 import type { DensitySize } from './components/ToolBar/DensityIcon';
 import type { ColumnsState, useContainer } from './container';
 import type { SearchConfig, TableFormItem } from './components/Form/FormRender';
+import type { LabelTooltipType } from 'antd/lib/form/FormItemLabel';
+import type { SizeType } from 'antd/lib/config-provider/SizeContext';
 
 export type PageInfo = {
   pageSize: number;
@@ -168,7 +170,7 @@ export type ProTableProps<T, U extends ParamsType, ValueType = 'text'> = {
   onSizeChange?: (size: DensitySize) => void;
 
   /** @name table 外面卡片的设置 */
-  cardProps?: CardProps;
+  cardProps?: CardProps | false;
 
   /** @name 渲染 table */
   tableRender?: (
@@ -195,7 +197,7 @@ export type ProTableProps<T, U extends ParamsType, ValueType = 'text'> = {
       keyword?: string;
     },
     sort: Record<string, SortOrder>,
-    filter: Record<string, React.ReactText[]>,
+    filter: Record<string, React.ReactText[] | null>,
   ) => Promise<Partial<RequestData<T>>>;
 
   /** @name 对数据进行一些处理 */
@@ -237,7 +239,7 @@ export type ProTableProps<T, U extends ParamsType, ValueType = 'text'> = {
   headerTitle?: React.ReactNode;
 
   /** @name 标题旁边的 tooltip */
-  tooltip?: string;
+  tooltip?: string | LabelTooltipType;
 
   /** @name 操作栏配置 */
   options?: OptionConfig | false;
@@ -276,7 +278,11 @@ export type ProTableProps<T, U extends ParamsType, ValueType = 'text'> = {
   tableAlertOptionRender?: AlertRenderType<T>;
 
   /** @name 选择项配置 */
-  rowSelection?: TableProps<T>['rowSelection'] | false;
+  rowSelection?:
+    | (TableProps<T>['rowSelection'] & {
+        alwaysShowAlert?: boolean;
+      })
+    | false;
 
   style?: React.CSSProperties;
 
@@ -303,6 +309,8 @@ export type ProTableProps<T, U extends ParamsType, ValueType = 'text'> = {
   cardBordered?: Bordered;
   /** Debounce time */
   debounceTime?: number;
+  /** 默认的表格大小 */
+  defaultSize?: SizeType;
 } & Omit<TableProps<T>, 'columns' | 'rowSelection'>;
 
 export type ActionType = ProCoreActionType & {

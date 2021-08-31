@@ -1,3 +1,4 @@
+import type { InternalNamePath, NamePath } from 'antd/lib/form/interface';
 import moment from 'moment';
 import get from 'rc-util/lib/utils/get';
 import isNil from '../isNil';
@@ -5,7 +6,7 @@ import type { ProFieldValueType } from '../typing';
 
 type DateFormatter = 'number' | 'string' | false;
 
-const dateFormatterMap = {
+export const dateFormatterMap = {
   time: 'HH:mm:ss',
   timeRange: 'HH:mm:ss',
   date: 'YYYY-MM-DD',
@@ -74,7 +75,7 @@ const convertMoment = (value: moment.Moment, dateFormatter: string | false, valu
  * @param dateFormatter
  * @param proColumnsMap
  */
-const conversionSubmitValue = <T = any>(
+const conversionMomentValue = <T = any>(
   value: T,
   dateFormatter: DateFormatter,
   valueTypeMap: Record<
@@ -86,22 +87,20 @@ const conversionSubmitValue = <T = any>(
     | any
   >,
   omitNil?: boolean,
-  parentKey?: string[],
+  parentKey?: NamePath,
 ): T => {
   const tmpValue = {} as T;
   // 如果 value 是 string | null | Blob类型 其中之一，直接返回
   // 形如 {key: [File, File]} 的表单字段当进行第二次递归时会导致其直接越过 typeof value !== 'object' 这一判断 https://github.com/ant-design/pro-components/issues/2071
-  if (typeof value !== 'object' || isNil(value) || value instanceof Blob) {
+  if (typeof value !== 'object' || isNil(value) || value instanceof Blob || Array.isArray(value)) {
     return value;
   }
-
   Object.keys(value).forEach((key) => {
-    const namePath = parentKey ? [parentKey, key].flat(1) : [key];
+    const namePath: InternalNamePath = parentKey ? ([parentKey, key].flat(1) as string[]) : [key];
     const valueFormatMap = get(valueTypeMap, namePath) || 'text';
 
     let valueType: ProFieldValueType = 'text';
     let dateFormat: string | undefined;
-
     if (typeof valueFormatMap === 'string') {
       valueType = valueFormatMap as ProFieldValueType;
     } else if (valueFormatMap) {
@@ -120,7 +119,7 @@ const conversionSubmitValue = <T = any>(
       // 不是 moment
       !moment.isMoment(itemValue)
     ) {
-      tmpValue[key] = conversionSubmitValue(itemValue, dateFormatter, valueTypeMap, omitNil, [key]);
+      tmpValue[key] = conversionMomentValue(itemValue, dateFormatter, valueTypeMap, omitNil, [key]);
       return;
     }
     // 处理 FormList 的 value
@@ -129,7 +128,7 @@ const conversionSubmitValue = <T = any>(
         if (moment.isMoment(arrayValue)) {
           return convertMoment(arrayValue, dateFormat || dateFormatter, valueType);
         }
-        return conversionSubmitValue(arrayValue, dateFormatter, valueTypeMap, omitNil, [
+        return conversionMomentValue(arrayValue, dateFormatter, valueTypeMap, omitNil, [
           key,
           `${index}`,
         ]);
@@ -138,7 +137,8 @@ const conversionSubmitValue = <T = any>(
     }
     tmpValue[key] = convertMoment(itemValue, dateFormat || dateFormatter, valueType);
   });
+
   return tmpValue;
 };
 
-export default conversionSubmitValue;
+export default conversionMomentValue;

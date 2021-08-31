@@ -9,6 +9,146 @@ group:
 
 # Change Log
 
+## @ant-design/pro-table@2.50.0
+
+`2021-08-24`
+
+- 💥 feat(table): support column.chilren render [#3487](https://github.com/ant-design/pro-components/pull/3487) [@chenshuai2144](https://github.com/chenshuai2144)
+
+## @ant-design/pro-table@2.49.0
+
+`2021-08-19`
+
+- 🐛 fix(table): fix typo entry -> entity [#3474](https://github.com/ant-design/pro-components/pull/3474) [@chenshuai2144](https://github.com/chenshuai2144)
+- 🐛 fix(table): 添加滚动条，防止小屏幕下溢出 [#3449](https://github.com/ant-design/pro-components/pull/3449) [@hihuangwei](https://github.com/hihuangwei)
+- 🐛 fix(table): rowSelection rowKey of default value [#3407](https://github.com/ant-design/pro-components/pull/3407) [@DerrickTel](https://github.com/DerrickTel)
+- 💥 feat(table): 增加在 ProTable 中的 ProColumns 中 fieldProps 支持的属性类型描述 [#3410](https://github.com/ant-design/pro-components/pull/3410) [@kiner-tang](https://github.com/kiner-tang)
+
+## @ant-design/pro-table@2.47.1
+
+`2021-08-05`
+
+- 🐛 fix(table): 设置 ProSchema 的 proFieldProps 为可选属性 [#3374](https://github.com/ant-design/pro-components/pull/3374) [@0x219](https://github.com/0x219)
+- feat(table): table support editable.formProps [#3363](https://github.com/ant-design/pro-components/pull/3363) [@chenshuai2144](https://github.com/chenshuai2144)
+
+## @ant-design/pro-table@2.46.0
+
+`2021-07-30`
+
+- 🐛 fix(table): hideInSetting can't work when fixed [#3325](https://github.com/ant-design/pro-components/pull/3325) [@DerrickTel](https://github.com/DerrickTel)
+- 🐛 fix(table): fix ColumnSetting hover style error [#3330](https://github.com/ant-design/pro-components/pull/3330) [@chenshuai2144](https://github.com/chenshuai2144)
+- 💥 feat(table): table rowSelection support alwaysShowAlert [#3339](https://github.com/ant-design/pro-components/pull/3339) [@chenshuai2144](https://github.com/chenshuai2144)
+
+## @ant-design/pro-table@2.45.0
+
+`2021-07-26`
+
+- 🐛 fix(table): add ListToolBar column default value [#3281](https://github.com/ant-design/pro-components/pull/3281) [@DerrickTel](https://github.com/DerrickTel)
+- 💥 feat(table): support children column add funtion [#3273](https://github.com/ant-design/pro-components/pull/3273) [@jetBn](https://github.com/jetBn)
+
+## @ant-design/pro-table@2.44.0
+
+`2021-07-21`
+
+- 💥 feat(table): record function add new params dataSource [#3278](https://github.com/ant-design/pro-components/pull/3278) [@chenshuai2144](https://github.com/chenshuai2144)
+
+## @ant-design/pro-table@2.43.5
+
+`2021-07-19`
+
+- 🐛 fix(table): fix onSave will merge origin data error [#3221](https://github.com/ant-design/pro-components/pull/3221) [@chenshuai2144](https://github.com/chenshuai2144)
+- 🐛 fix(table): fix table align with tooltip [#3193](https://github.com/ant-design/pro-components/pull/3193) [@linxianxi](https://github.com/linxianxi)
+
+## @ant-design/pro-table@2.43.1
+
+`2021-06-28`
+
+- Revert "fix(table): fix mergePagination order (#2985)" [#3111](https://github.com/ant-design/pro-components/pull/3111) [@chenshuai2144](https://github.com/chenshuai2144)
+- 🐛 fix(table): remove onchange form renderFormItem [#3106](https://github.com/ant-design/pro-components/pull/3106) [@chenshuai2144](https://github.com/chenshuai2144)
+- 🐛 fix(table): fix onSearch no work error [#3097](https://github.com/ant-design/pro-components/pull/3097) [@chenshuai2144](https://github.com/chenshuai2144)
+
+## @ant-design/pro-table@2.43.0
+
+`2021-06-23`
+
+- 🐛 fix(table): fix mergePagination order (#2985) [#3050](https://github.com/ant-design/pro-components/pull/3050) [@DerrickTel](https://github.com/DerrickTel)
+
+## @ant-design/pro-table@2.41.0
+
+`2021-06-15`
+
+- 🐛 fix(table): 处理分页问题 (#2212) [#3008](https://github.com/ant-design/pro-components/pull/3008) [@dingtianxiu](https://github.com/dingtianxiu)
+- 🐛 fix(table): hideInForm true 的时候，hideInSearch 失效 (#2986) [#2993](https://github.com/ant-design/pro-components/pull/2993) [@dingtianxiu](https://github.com/dingtianxiu)
+- 💥 feat(table): TableDropdown support all Menu.Item [#2989](https://github.com/ant-design/pro-components/pull/2989) [@DerrickTel](https://github.com/DerrickTel)
+
+## @ant-design/pro-table@2.40.0
+
+`2021-06-08`
+
+- 🐛 fix(table): SelectedRowKeys 受控处理 selectRows (#2446) [#2963](https://github.com/ant-design/pro-components/pull/2963) [@dingtianxiu](https://github.com/dingtianxiu)
+- 🐛 fix(table): fix table ellipsis automatically (#2948) [#2964](https://github.com/ant-design/pro-components/pull/2964) [@DerrickTel](https://github.com/DerrickTel)
+- 🐛 fix(pro-table): fix alert style [#2953](https://github.com/ant-design/pro-components/pull/2953) [@hemengke1997](https://github.com/hemengke1997)
+- 🐛 fix(table): fix onChange multiple calls error [#2945](https://github.com/ant-design/pro-components/pull/2945) [@chenshuai2144](https://github.com/chenshuai2144)
+- 🐛 fix(table): fix tree table no work error [#2943](https://github.com/ant-design/pro-components/pull/2943) [@chenshuai2144](https://github.com/chenshuai2144)
+- 🐛 fix(table): support three levels of nesting [#2941](https://github.com/ant-design/pro-components/pull/2941) [@chenshuai2144](https://github.com/chenshuai2144)
+- 💥 feat(table): EditableTable support controlled [#2965](https://github.com/ant-design/pro-components/pull/2965) [@chenshuai2144](https://github.com/chenshuai2144)
+- 💥 feat(table): onsave support origin data and no merge record [#2949](https://github.com/ant-design/pro-components/pull/2949) [@chenshuai2144](https://github.com/chenshuai2144)
+
+## @ant-design/pro-table@2.39.2
+
+`2021-05-31`
+
+- 🐛 fix(table): dateRange render wrong with light mode [#2867](https://github.com/ant-design/pro-components/pull/2867) [@dingtianxiu](https://github.com/dingtianxiu)
+
+## @ant-design/pro-table@2.39.1
+
+`2021-05-28`
+
+- 🐛 fix(table): fix table shouldUpdate [#2848](https://github.com/ant-design/pro-components/pull/2848) [@linxianxi](https://github.com/linxianxi)
+
+## @ant-design/pro-table@2.39.0
+
+`2021-05-25`
+
+- 💥 feat(table): eidt table use Proform [#2832](https://github.com/ant-design/pro-components/pull/2832) [@chenshuai2144](https://github.com/chenshuai2144)
+
+## @ant-design/pro-table@2.37.1
+
+`2021-05-21`
+
+- 🐛 fix(table): if editableKeys change,should Cell Update [#2803](https://github.com/ant-design/pro-components/pull/2803) [@chenshuai2144](https://github.com/chenshuai2144)
+
+## @ant-design/pro-table@2.37.0
+
+`2021-05-18`
+
+- fix(table): A little performance improvement [#2759](https://github.com/ant-design/pro-components/pull/2759) [@chenshuai2144](https://github.com/chenshuai2144)
+- 🐛 fix(list): add editable props types [#2758](https://github.com/ant-design/pro-components/pull/2758) [@chenshuai2144](https://github.com/chenshuai2144)
+- 🐛 fix(table): tabs and menu add keys [#2733](https://github.com/ant-design/pro-components/pull/2733) [@chenshuai2144](https://github.com/chenshuai2144)
+
+## @ant-design/pro-table@2.36.0
+
+`2021-05-11`
+
+- 🐛 fix(table): fix defaultRender will gen two label error [#2715](https://github.com/ant-design/pro-components/pull/2715) [@chenshuai2144](https://github.com/chenshuai2144)
+- fix: toolbar fullScreen default value [#2691](https://github.com/ant-design/pro-components/pull/2691) [@hengkx](https://github.com/hengkx)
+- 🐛 fix(table): fix the style problem of the fixed new button [#2661](https://github.com/ant-design/pro-components/pull/2661) [@wen-haoming](https://github.com/wen-haoming)
+- 💥 feat(table): support sync pageinfo to url [#2701](https://github.com/ant-design/pro-components/pull/2701) [@chenshuai2144](https://github.com/chenshuai2144)
+
+## @ant-design/pro-table@2.35.0
+
+`2021-04-29`
+
+- 🐛 fix(table): only onFilter === true run defaultOnFilter [#2640](https://github.com/ant-design/pro-components/pull/2640) [@chenshuai2144](https://github.com/chenshuai2144)
+
+## @ant-design/pro-table@2.34.5
+
+`2021-04-22`
+
+- 🐛 fix(utils): stop propagation icon event [#2566](https://github.com/ant-design/pro-components/pull/2566) [@chenshuai2144](https://github.com/chenshuai2144)
+- 🐛 fix(utils): 修复 InlineErrorFormItem 的 Popover 问题 [#2546](https://github.com/ant-design/pro-components/pull/2546) [@xiefengnian](https://github.com/xiefengnian)
+- 🐛 fix(table): fix the problem of nested data reporting errors [#2578](https://github.com/ant-design/pro-components/pull/2578) [@chenshuai2144](https://github.com/chenshuai2144)
+
 ## @ant-design/pro-table@2.34.2
 
 `2021-04-19`

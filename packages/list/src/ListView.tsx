@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import type { ListProps, TableColumnType, TableProps } from 'antd';
-import { List } from 'antd';
+import { ConfigProvider, List } from 'antd';
 import type { GetRowKey } from 'antd/lib/table/interface';
 import type { ActionType } from '@ant-design/pro-table';
 import type { GetComponentProps } from './index';
@@ -8,8 +8,10 @@ import get from 'rc-util/lib/utils/get';
 import useLazyKVMap from 'antd/lib/table/hooks/useLazyKVMap';
 import useSelection from 'antd/lib/table/hooks/useSelection';
 import usePagination from 'antd/lib/table/hooks/usePagination';
+import type { ItemProps } from './Item';
 import ProListItem from './Item';
 import { PRO_LIST_KEYS } from './constants';
+import classNames from 'classnames';
 
 type AntdListProps<RecordType> = Omit<ListProps<RecordType>, 'rowKey'>;
 type Key = React.Key;
@@ -26,6 +28,9 @@ export type ListViewProps<RecordType> = Omit<AntdListProps<RecordType>, 'renderI
     renderItem?: (item: RecordType, index: number, defaultDom: JSX.Element) => React.ReactNode;
     actionRef: React.MutableRefObject<ActionType | undefined>;
     onRow?: GetComponentProps<RecordType>;
+    /** Render 除了 header 之后的代码 */
+    itemHeaderRender?: ItemProps<RecordType>['itemHeaderRender'];
+    itemTitleRender?: ItemProps<RecordType>['itemTitleRender'];
   };
 
 function ListView<RecordType>(props: ListViewProps<RecordType>) {
@@ -37,13 +42,16 @@ function ListView<RecordType>(props: ListViewProps<RecordType>) {
     showExtra,
     prefixCls,
     actionRef,
+    itemTitleRender,
     renderItem,
+    itemHeaderRender,
     expandable: expandableConfig,
     rowSelection,
     pagination, // List 的 pagination 默认是 false
     onRow,
     ...rest
   } = props;
+  const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
 
   const getRowKey = React.useMemo<GetRowKey<RecordType>>((): GetRowKey<RecordType> => {
     if (typeof rowKey === 'function' && rowKey) {
@@ -143,6 +151,7 @@ function ListView<RecordType>(props: ListViewProps<RecordType>) {
   return (
     <List<RecordType>
       {...rest}
+      className={classNames(getPrefixCls('pro-list-container'), rest.className)}
       dataSource={pageData}
       pagination={pagination && (mergedPagination as ListViewProps<RecordType>['pagination'])}
       renderItem={(item, index) => {
@@ -177,9 +186,13 @@ function ListView<RecordType>(props: ListViewProps<RecordType>) {
             onExpand={() => {
               onTriggerExpand(item);
             }}
+            index={index}
             record={item}
+            item={item}
             showActions={showActions}
             showExtra={showExtra}
+            itemTitleRender={itemTitleRender}
+            itemHeaderRender={itemHeaderRender}
             rowSupportExpand={!rowExpandable || (rowExpandable && rowExpandable(item))}
             selected={selectedKeySet.has(getRowKey(item, index))}
             checkbox={checkboxDom}

@@ -1,7 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SchemaForm 😊 SchemaForm support table 1`] = `
+exports[`SchemaForm 😊 SchemaForm support columns 1`] = `
 <form
+  autocomplete="off"
   class="ant-form ant-form-vertical"
 >
   <input
@@ -96,9 +97,7 @@ exports[`SchemaForm 😊 SchemaForm support table 1`] = `
         >
           <div
             class="ant-select ant-pro-filed-search-select ant-select-single ant-select-allow-clear ant-select-show-arrow"
-            name="state"
             style="min-width:100px"
-            text="all"
           >
             <div
               class="ant-select-selector"
@@ -212,9 +211,7 @@ exports[`SchemaForm 😊 SchemaForm support table 1`] = `
         >
           <div
             class="ant-select ant-pro-filed-search-select ant-select-single ant-select-allow-clear ant-select-show-arrow"
-            name="direction"
             style="min-width:100px"
-            text=""
           >
             <div
               class="ant-select-selector"

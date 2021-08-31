@@ -7,9 +7,7 @@ export type Action = {
 
 export type Result = [boolean, Action];
 
-export default function useDarkreader(
-  defaultDarken: boolean = false,
-): [
+export default function useDarkreader(defaultDarken: boolean = false): [
   boolean,
   {
     toggle: () => void;
@@ -22,6 +20,7 @@ export default function useDarkreader(
     exportGeneratedCSS: collectCSS,
     setFetchMethod,
   } = DarkReader || {};
+
   const [isDark, setIsDark] = useState(defaultDarken);
 
   const defaultTheme = {
@@ -41,7 +40,7 @@ export default function useDarkreader(
     if (!DarkReader) {
       return () => null;
     }
-    setFetchMethod(window.fetch);
+    setFetchMethod(fetch);
 
     isDark ? enableDarkMode(defaultTheme, defaultFixes) : disableDarkMode();
 

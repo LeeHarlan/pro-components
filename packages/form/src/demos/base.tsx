@@ -14,28 +14,36 @@ export default () => {
   return (
     <ProForm<{
       name: string;
-      company: string;
+      company?: string;
+      useMode?: string;
     }>
       onFinish={async (values) => {
         await waitTime(2000);
         console.log(values);
         message.success('提交成功');
       }}
-      initialValues={{
-        name: '蚂蚁设计有限公司',
-        useMode: 'chapter',
+      params={{}}
+      request={async () => {
+        await waitTime(100);
+        return {
+          name: '蚂蚁设计有限公司',
+          useMode: 'chapter',
+        };
       }}
     >
       <ProForm.Group>
         <ProFormText
           width="md"
           name="name"
+          addonBefore={<a>客户名称应该怎么获得？</a>}
+          addonAfter={<a>点击查看更多</a>}
           label="签约客户名称"
           tooltip="最长为 24 位"
           placeholder="请输入名称"
         />
         <ProFormText width="md" name="company" label="我方公司名称" placeholder="请输入名称" />
       </ProForm.Group>
+
       <ProForm.Group>
         <ProFormText
           name={['contract', 'name']}
@@ -67,7 +75,7 @@ export default () => {
             },
           ]}
           name="unusedMode"
-          label="合同约定失效效方式"
+          label="合同约定失效方式"
         />
       </ProForm.Group>
       <ProFormText width="sm" name="id" label="主合同编号" />

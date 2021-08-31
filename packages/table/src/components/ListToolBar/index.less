@@ -3,14 +3,15 @@
 @pro-list-toolbar: ~'@{ant-prefix}-pro-table-list-toolbar';
 
 .@{pro-list-toolbar} {
-  overflow-x: auto;
-  overflow-y: hidden;
   line-height: 1;
 
   &-container {
     display: flex;
     justify-content: space-between;
     padding: @padding-md 0;
+    &-mobile {
+      flex-direction: column;
+    }
   }
 
   &-title {

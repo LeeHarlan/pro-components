@@ -63,7 +63,28 @@ function DrawerForm<T = Record<string, any>>({
     onChange: onVisibleChange,
   });
 
-  const [scrollLocker] = useState(() => new ScrollLocker());
+  const context = useContext(ConfigProvider.ConfigContext);
+
+  const renderDom = useMemo(() => {
+    if (drawerProps?.getContainer) {
+      if (typeof drawerProps?.getContainer === 'function') {
+        return drawerProps?.getContainer?.();
+      }
+      if (typeof drawerProps?.getContainer === 'string') {
+        return document.getElementById(drawerProps?.getContainer);
+      }
+      return drawerProps?.getContainer;
+    }
+    return context?.getPopupContainer?.(document.body);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [context, drawerProps, visible]);
+
+  const [scrollLocker] = useState(
+    () =>
+      new ScrollLocker({
+        container: renderDom || document.body,
+      }),
+  );
 
   noteOnce(
     // eslint-disable-next-line @typescript-eslint/dot-notation
@@ -80,6 +101,9 @@ function DrawerForm<T = Record<string, any>>({
     if (visible && rest.visible) {
       onVisibleChange?.(true);
     }
+    return () => {
+      if (!visible) scrollLocker?.unLock?.();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
@@ -101,7 +125,6 @@ function DrawerForm<T = Record<string, any>>({
   }, [visible, drawerProps?.destroyOnClose]);
   /** 同步 props 和 本地 */
   const formRef = useRef<FormInstance>();
-  const context = useContext(ConfigProvider.ConfigContext);
 
   /** 如果 destroyOnClose ，重置一下表单 */
   useEffect(() => {
@@ -114,25 +137,14 @@ function DrawerForm<T = Record<string, any>>({
     }
   }, [drawerProps?.destroyOnClose, visible]);
 
-  useEffect(() => () => {
-    scrollLocker?.unLock?.();
-  });
+  useEffect(
+    () => () => {
+      scrollLocker?.unLock?.();
+    },
+    [],
+  );
 
   useImperativeHandle(rest.formRef, () => formRef.current);
-
-  const renderDom = useMemo(() => {
-    if (drawerProps?.getContainer) {
-      if (typeof drawerProps?.getContainer === 'function') {
-        return drawerProps?.getContainer?.();
-      }
-      if (typeof drawerProps?.getContainer === 'string') {
-        return document.getElementById(drawerProps?.getContainer);
-      }
-      return drawerProps?.getContainer;
-    }
-    return context?.getPopupContainer?.(document.body);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [context, drawerProps, visible]);
 
   /** 不放到 body 上会导致 z-index 的问题 遮罩什么的都遮不住了 */
   return (
@@ -143,28 +155,36 @@ function DrawerForm<T = Record<string, any>>({
             layout="vertical"
             {...omit(rest, ['visible'])}
             formRef={formRef}
-            submitter={{
-              searchConfig: {
-                submitText: '确认',
-                resetText: '取消',
-              },
-              resetButtonProps: {
-                preventDefault: true,
-                onClick: (e: any) => {
-                  setVisible(false);
-                  drawerProps?.onClose?.(e);
-                },
-              },
-              ...rest.submitter,
-            }}
+            submitter={
+              rest.submitter === false
+                ? false
+                : {
+                    ...rest.submitter,
+                    searchConfig: {
+                      submitText: '确认',
+                      resetText: '取消',
+                      ...rest.submitter?.searchConfig,
+                    },
+                    resetButtonProps: {
+                      preventDefault: true,
+                      onClick: (e: any) => {
+                        setVisible(false);
+                        drawerProps?.onClose?.(e);
+                      },
+                      ...rest.submitter?.resetButtonProps,
+                    },
+                  }
+            }
             onFinish={async (values) => {
               if (!onFinish) {
                 return;
               }
               const success = await onFinish(values);
               if (success) {
-                formRef.current?.resetFields();
                 setVisible(false);
+                setTimeout(() => {
+                  if (drawerProps?.destroyOnClose) formRef.current?.resetFields();
+                }, 300);
               }
             }}
             contentRender={(item, submitter) => {
@@ -180,14 +200,16 @@ function DrawerForm<T = Record<string, any>>({
                     drawerProps?.onClose?.(e);
                   }}
                   footer={
-                    <div
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'flex-end',
-                      }}
-                    >
-                      {submitter}
-                    </div>
+                    !!submitter && (
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'flex-end',
+                        }}
+                      >
+                        {submitter}
+                      </div>
+                    )
                   }
                 >
                   {shouldRenderFormItems ? item : null}

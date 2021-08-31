@@ -10,6 +10,37 @@ group:
 
 # Change Log
 
+## @ant-design/pro-card@1.13.0
+
+`2021-05-25`
+
+- 💥 feat(card): card support ref(#2831) [#2842](https://github.com/ant-design/pro-components/pull/2842) [@DerrickTel](https://github.com/DerrickTel)
+
+## @ant-design/pro-card@1.12.2
+
+`2021-05-24`
+
+- 🐛 fix(card): use antd less var for title [#2817](https://github.com/ant-design/pro-components/pull/2817) [@chenshuai2144](https://github.com/chenshuai2144)
+
+## @ant-design/pro-card@1.12.0
+
+`2021-05-18`
+
+- 🐛 fix(card): card loading in layout center [#2739](https://github.com/ant-design/pro-components/pull/2739) [@rdmclin2](https://github.com/rdmclin2)
+
+## @ant-design/pro-card@1.11.13
+
+`2021-05-11`
+
+- 🐛 fix(card): col map lost key [#2694](https://github.com/ant-design/pro-components/pull/2694) [@rdmclin2](https://github.com/rdmclin2)
+
+## @ant-design/pro-card@1.11.12
+
+`2021-04-29`
+
+- 🐛 fix(form): ispicturecard judgment logic [#2619](https://github.com/ant-design/pro-components/pull/2619) [@0x30](https://github.com/0x30)
+- 🐛 fix(card): support multiLine and add responsive demos [#2589](https://github.com/ant-design/pro-components/pull/2589) [@rdmclin2](https://github.com/rdmclin2)
+
 ## @ant-design/pro-card@1.11.0
 
 `2021-03-11`

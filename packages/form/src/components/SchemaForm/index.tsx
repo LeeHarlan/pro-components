@@ -1,6 +1,13 @@
 ﻿import React, { useCallback, useMemo, useRef, useState } from 'react';
 import type { FormInstance, FormProps } from 'antd';
-import type { DrawerFormProps, QueryFilterProps, ProFormProps, StepFormProps } from '../../index';
+import { Divider } from 'antd';
+import type {
+  DrawerFormProps,
+  QueryFilterProps,
+  ProFormProps,
+  StepFormProps,
+  ModalFormProps,
+} from '../../index';
 import { ProFormFieldSet } from '../../index';
 import { ProFormGroup, ProFormField } from '../../index';
 import type {
@@ -9,7 +16,7 @@ import type {
   ProSchemaComponentTypes,
   SearchTransformKeyFn,
 } from '@ant-design/pro-utils';
-import { omitUndefined } from '@ant-design/pro-utils';
+import { LabelIconTip, omitUndefined } from '@ant-design/pro-utils';
 import { runFunction } from '@ant-design/pro-utils';
 import omit from 'omit.js';
 import ProForm, { DrawerForm, ModalForm, QueryFilter, LightFilter, StepsForm } from '../../index';
@@ -40,18 +47,21 @@ export type ProFormLayoutType =
   | 'ModalForm'
   | 'DrawerForm'
   | 'StepsForm'
+  | 'StepForm'
   | 'LightFilter'
-  | 'QueryFilter';
+  | 'QueryFilter'
+  | 'Embed';
 
 /** ProForm 支持的相关类型 */
 export type ProFormPropsType<T> = Omit<DrawerFormProps<T>, 'onFinish'> &
   Omit<QueryFilterProps<T>, 'onFinish'> &
   ProFormProps<T> &
-  Omit<StepFormProps<T>, 'onFinish'> & {
+  Omit<StepFormProps<T>, 'onFinish'> &
+  Omit<ModalFormProps<T>, 'onFinish'> & {
     layoutType?: ProFormLayoutType;
   };
 
-export type FormFieldType = 'group' | 'formList' | 'formSet';
+export type FormFieldType = 'group' | 'formList' | 'formSet' | 'divider';
 
 export type ProFormColumnsType<T = any, ValueType = 'text'> = ProSchema<
   T,
@@ -80,9 +90,16 @@ export type ProFormColumnsType<T = any, ValueType = 'text'> = ProSchema<
 >;
 
 export type FormSchema<T = Record<string, any>, ValueType = 'text'> = {
-  title?: React.ReactNode | ((type: string) => React.ReactNode);
+  title?:
+    | React.ReactNode
+    | ((
+        schema: ProFormColumnsType<T, ValueType>,
+        type: 'form',
+        dom: React.ReactNode,
+      ) => React.ReactNode);
   description?: React.ReactNode;
-  columns: ProFormColumnsType<T, ValueType>[];
+  steps?: StepFormProps[];
+  columns: ProFormColumnsType<T, ValueType>[] | ProFormColumnsType<T, ValueType>[][];
   type?: any;
   action?: React.MutableRefObject<ProCoreActionType | undefined>;
 } & Omit<FormProps<T>, 'onFinish'> &
@@ -92,6 +109,7 @@ const FormComments = {
   DrawerForm,
   QueryFilter,
   LightFilter,
+  StepForm: StepsForm.StepForm,
   StepsForm,
   ModalForm,
 };
@@ -102,7 +120,7 @@ const FormComments = {
  * @see 此组件仍为 beta 版本，api 可能发生变化
  */
 function BetaSchemaForm<T, ValueType = 'text'>(props: FormSchema<T, ValueType>) {
-  const { columns, layoutType = 'ProForm', type = 'form', action, ...rest } = props;
+  const { columns, layoutType = 'ProForm', steps = [], type = 'form', action, ...rest } = props;
   const Form = (FormComments[layoutType] || ProForm) as React.FC<ProFormProps<T>>;
   const [form] = ProForm.useForm();
   const formRef = useRef<FormInstance>(form);
@@ -114,39 +132,56 @@ function BetaSchemaForm<T, ValueType = 'text'>(props: FormSchema<T, ValueType>) 
    * @param items
    */
   const genItems = useCallback(
-    (items: FormSchema<T, ValueType>['columns'], update?: number) =>
-      items
+    (items: FormSchema<T, ValueType>['columns'], update?: number) => {
+      if (layoutType === 'StepsForm') return [];
+      return (items as ProFormColumnsType<T, ValueType>[])
+        .filter((originItem) => {
+          if (originItem.hideInForm && type === 'form') {
+            return false;
+          }
+          return true;
+        })
         .sort((a, b) => {
           if (b.order || a.order) {
             return (b.order || 0) - (a.order || 0);
           }
           return (b.index || 0) - (a.index || 0);
         })
-        .map((newItem, index) => {
-          const title = runFunction(newItem.title, 'form');
+        .map((originItem, index) => {
+          const title = runFunction(
+            originItem.title,
+            originItem,
+            'form',
+            <LabelIconTip
+              label={originItem.title}
+              tooltip={originItem.tooltip || originItem.tip}
+            />,
+          );
           const item = omitUndefined({
-            name: newItem.name,
-            valueType: runFunction(newItem.valueType, {}),
-            key: newItem.key,
-            columns: newItem.columns,
-            fieldProps: runFunction(newItem.fieldProps, formRef.current, newItem),
-            valueEnum: newItem.valueEnum,
-            dataIndex: newItem.key || newItem.dataIndex,
-            initialValue: newItem.initialValue,
-            formItemProps: runFunction(newItem.formItemProps, formRef.current, newItem),
-            width: newItem.width,
-            render: newItem.render,
-            renderFormItem: newItem.renderFormItem,
-            index: newItem.index,
-            readonly: newItem.readonly,
-            transform: newItem.transform,
-            colSize: newItem.colSize,
-            className: newItem.className,
-            renderText: newItem.renderText,
-            request: newItem.request,
-            params: newItem.params,
-            tooltip: newItem.tooltip || newItem.tip,
+            name: originItem.name,
+            valueType: runFunction(originItem.valueType, {}),
+            key: originItem.key,
+            columns: originItem.columns,
+            fieldProps: runFunction(originItem.fieldProps, formRef.current, originItem),
+            valueEnum: originItem.valueEnum,
+            dataIndex: originItem.key || originItem.dataIndex,
+            initialValue: originItem.initialValue,
+            formItemProps: runFunction(originItem.formItemProps, formRef.current, originItem),
+            width: originItem.width,
+            render: originItem.render,
+            renderFormItem: originItem.renderFormItem,
+            index: originItem.index,
+            readonly: originItem.readonly,
+            transform: originItem.transform,
+            colSize: originItem.colSize,
+            className: originItem.className,
+            renderText: originItem.renderText,
+            request: originItem.request,
+            params: originItem.params,
+            tooltip: originItem.tooltip || originItem.tip,
             title,
+            dependencies: originItem.dependencies,
+            proFieldProps: originItem.proFieldProps,
           });
           // 几种特殊的 value 不处理
           if (
@@ -161,7 +196,7 @@ function BetaSchemaForm<T, ValueType = 'text'>(props: FormSchema<T, ValueType>) 
           if (item.valueType === 'group') {
             if (!item.columns) return null;
             return (
-              <ProFormGroup key={key} label={item.title} {...item.fieldProps}>
+              <ProFormGroup key={key} label={title} {...item.fieldProps}>
                 {genItems(item.columns)}
               </ProFormGroup>
             );
@@ -197,6 +232,12 @@ function BetaSchemaForm<T, ValueType = 'text'>(props: FormSchema<T, ValueType>) 
               </ProFormFieldSet>
             );
           }
+
+          /** 分割线 */
+          if (item.valueType === 'divider') {
+            return <Divider {...item.fieldProps} />;
+          }
+
           /** 公用的 类型 props */
           const formFieldProps: ProFormFieldProps = {
             key,
@@ -222,7 +263,7 @@ function BetaSchemaForm<T, ValueType = 'text'>(props: FormSchema<T, ValueType>) 
               : undefined,
           };
           const defaultRender = () => {
-            return <ProFormField {...formFieldProps} />;
+            return <ProFormField {...formFieldProps} ignoreFormItem={true} />;
           };
 
           if (item?.renderFormItem) {
@@ -230,6 +271,7 @@ function BetaSchemaForm<T, ValueType = 'text'>(props: FormSchema<T, ValueType>) 
               {
                 type,
                 ...item,
+                originProps: originItem,
               },
               {
                 ...item,
@@ -250,39 +292,62 @@ function BetaSchemaForm<T, ValueType = 'text'>(props: FormSchema<T, ValueType>) 
               transform={item.transform}
               renderFormItem={
                 item?.renderFormItem
-                  ? (_, config) =>
-                      item?.renderFormItem?.(
+                  ? (_, config) => {
+                      const renderConfig = omitUndefined({ ...config, onChange: undefined });
+                      return item?.renderFormItem?.(
                         {
                           type,
                           ...item,
+                          originProps: originItem,
                         },
                         {
-                          ...config,
+                          ...renderConfig,
                           defaultRender,
                           type,
                         },
                         formRef.current,
-                      )
+                      );
+                    }
                   : undefined
               }
             />
           );
-        }),
-    [action, type],
+        });
+    },
+    [action, layoutType, type],
   );
 
   const needRealUpdate = useMemo(() => {
-    return columns.some(
+    if (layoutType === 'StepsForm') return [];
+    return (columns as ProFormColumnsType<T, ValueType>[]).some(
       (item) =>
         item.renderFormItem ||
         typeof item.fieldProps === 'function' ||
         typeof item.formItemProps === 'function',
     );
-  }, [columns]);
+  }, [columns, layoutType]);
 
   const domList = useMemo(() => {
     return genItems(columns, updateTime);
   }, [columns, genItems, updateTime]);
+
+  if (layoutType === 'StepsForm') {
+    return (
+      <StepsForm formRef={formRef} form={form} {...rest}>
+        {steps?.map((item, index) => (
+          <BetaSchemaForm<T, ValueType>
+            {...(item as FormSchema<T, ValueType>)}
+            key={index}
+            layoutType="StepForm"
+            columns={columns[index] as ProFormColumnsType<T, ValueType>[]}
+          />
+        ))}
+      </StepsForm>
+    );
+  }
+
+  /** 如果是行内模式 */
+  if (layoutType === 'Embed') return <>{domList}</>;
 
   return (
     <Form

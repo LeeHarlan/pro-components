@@ -43,6 +43,7 @@ describe('Table ColumnSetting', () => {
         .simulate('click');
     });
     await waitForComponentToPaint(html);
+
     const titleList = html.find(
       '.ant-pro-table-column-setting-overlay .ant-pro-table-column-setting-list-title',
     );
@@ -158,6 +159,18 @@ describe('Table ColumnSetting', () => {
             key: 'name',
             dataIndex: 'name',
             copyable: true,
+            children: [
+              {
+                title: 'Name2',
+                key: 'name2',
+                dataIndex: 'name2',
+              },
+              {
+                title: 'Name3',
+                key: 'name3',
+                dataIndex: 'name3',
+              },
+            ],
           },
         ]}
         request={async () => {
@@ -166,6 +179,8 @@ describe('Table ColumnSetting', () => {
               {
                 key: 1,
                 name: `TradeCode ${1}`,
+                name2: `TradeCode ${1}`,
+                name3: `TradeCode ${1}`,
                 createdAt: 1602572994055,
               },
             ],

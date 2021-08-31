@@ -29,7 +29,7 @@ nav:
 | `params` | `Record<string, any>` | 额外传递给 `request` 的参数，组件不做处理,但是变化会引起`request` 重新请求数据 |
 | `hideInForm` | `boolean` | 在 Form 中隐藏 |
 | `hideInTable` | `boolean` | 在 Table 中隐藏 |
-| `hideInSearch` | `boolean` | 在 Table 的查询表格中隐藏 |
+| `hideInSearch` | `boolean` | 在 Table 的查询表单中隐藏 |
 | `hideInDescriptions` | `boolean` | 在 descriptions 中隐藏 |
 
 ## valueType
@@ -63,7 +63,7 @@ valueType 是 ProComponents 的灵魂，ProComponents 会根据 valueType 来映
 | `second`        | 秒格式化                     |
 | `avatar`        | 头像                         |
 | `code`          | 代码框                       |
-| `switch`        | 单选多选                     |
+| `switch`        | 开关                         |
 | `fromNow`       | 相对于当前时间               |
 | `image`         | 图片                         |
 | `jsonCode`      | 代码框，但是带了 json 格式化 |
@@ -198,6 +198,34 @@ const valueEnum = {
 };
 ```
 
+```tsx
+import React from 'react';
+import { ProFormSelect } from '@ant-design/pro-form';
+
+const valueEnum = {
+  all: { text: '全部', status: 'Default' },
+  open: {
+    text: '未解决',
+    status: 'Error',
+  },
+  closed: {
+    text: '已解决',
+    status: 'Success',
+  },
+};
+
+export default () => (
+  <ProFormSelect
+    name="select2"
+    label="Select"
+    params={{}}
+    valueType="select"
+    valueEnum={valueEnum}
+    placeholder="Please select a country"
+  />
+);
+```
+
 ### `fieldProps.options`
 
 options 是 antd 定义的标准，但是只有部分组件支持， ProComponents 扩展了组件，使得 `select`, `checkbox`, `radio`, `radioButton` 都支持了 `options`, 他们的用法是相同的。
@@ -248,6 +276,36 @@ const columns = [
 ];
 ```
 
+```tsx
+import React from 'react';
+import { ProFormSelect } from '@ant-design/pro-form';
+
+const options = [
+  {
+    label: 'item 1',
+    value: 'a',
+  },
+  {
+    label: 'item 2',
+    value: 'b',
+  },
+  {
+    label: 'item 3',
+    value: 'c',
+  },
+];
+
+export default () => (
+  <ProFormSelect
+    name="select2"
+    label="Select"
+    valueType="select"
+    fieldProps={{ options }}
+    placeholder="Please select a country"
+  />
+);
+```
+
 ### `request` 和 `params`
 
 大部分时候我们是从网络中获取数据，但是获取写一个 hooks 来请求数据还是比较繁琐的，同时还要定义一系列状态，所以我们提供了 `request` 和 `params` 来获取数据。
@@ -283,6 +341,35 @@ const columns = [
     params: {},
   },
 ];
+```
+
+```tsx
+import React from 'react';
+import ProForm, { ProFormText, ProFormSelect } from '@ant-design/pro-form';
+
+const request = async (params) => {
+  console.log(params);
+  return [
+    { label: params.text, value: 'all' },
+    { label: '未解决', value: 'open' },
+    { label: '已解决', value: 'closed' },
+    { label: '解决中', value: 'processing' },
+  ];
+};
+
+export default () => (
+  <ProForm>
+    <ProFormText label="相互依赖的" initialValue="所有的" name="text" />
+    <ProFormSelect
+      name="select2"
+      label="Select"
+      valueType="select"
+      dependencies={['text']}
+      request={request}
+      placeholder="Please select a country"
+    />
+  </ProForm>
+);
 ```
 
 在实际的使用中 `request` 增加了一个 5s 缓存，可能会导致数据更新不及时，如果需要频繁更新，建议使用 `state`+`fieldProps.options`。

@@ -12,6 +12,7 @@ import ProFormRate from './components/Rate';
 import ProFormSlider from './components/Slider';
 import ProFormUploadDragger from './components/UploadDragger';
 import ProFormUploadButton from './components/UploadButton';
+import type { ProFormFieldProps } from './components/Field';
 import ProFormField from './components/Field';
 import ProFormSelect from './components/Select';
 import ProFormDigit from './components/Digit';
@@ -34,14 +35,19 @@ import type { ModalFormProps } from './layouts/ModalForm';
 import ModalForm from './layouts/ModalForm';
 import type { DrawerFormProps } from './layouts/DrawerForm';
 import DrawerForm from './layouts/DrawerForm';
+import type { LoginFormProps } from './layouts/LoginForm';
+import LoginForm from './layouts/LoginForm';
 import type { ProFormListProps } from './components/List';
 import ProFormList from './components/List';
-import type { FormInstance, FormItemProps, FormProps } from './BaseForm';
+import type { FormInstance, FormItemProps, FormProps, ProFormInstance } from './BaseForm';
 import type { ProFormLayoutType, ProFormColumnsType } from './components/SchemaForm';
 import BetaSchemaForm from './components/SchemaForm';
 import './index.less';
+import { ProFormContext } from '@ant-design/pro-utils';
+import type { LightFilterFooterRender, ProFormFieldItemProps } from './interface';
 
 export type {
+  ProFormFieldProps,
   ProFormCaptchaProps,
   BaseQueryFilterProps,
   DrawerFormProps,
@@ -57,7 +63,11 @@ export type {
   FormItemProps,
   FormInstance,
   ProFormListProps,
+  LightFilterFooterRender,
+  ProFormFieldItemProps as ProFormItemProps,
   ProFormColumnsType,
+  LoginFormProps,
+  ProFormInstance,
 };
 
 const ProFormGroup = ProForm.Group;
@@ -94,6 +104,8 @@ export {
   StepsForm,
   DrawerForm,
   ModalForm,
+  ProFormContext,
+  LoginForm,
 };
 
 export default ProForm;

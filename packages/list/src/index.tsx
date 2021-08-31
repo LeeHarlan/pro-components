@@ -4,17 +4,27 @@ import classNames from 'classnames';
 import type { ProTableProps, ProColumnType, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import type { ParamsType } from '@ant-design/pro-provider';
-import { ConfigProvider, Form } from 'antd';
+import { ConfigProvider } from 'antd';
+import type { LabelTooltipType } from 'antd/lib/form/FormItemLabel';
 
 import ListView from './ListView';
 
 import './index.less';
+import type { ItemProps } from './Item';
 
 type AntdListProps<RecordType> = Omit<ListProps<RecordType>, 'rowKey'>;
 
 type ProListMeta<T> = Pick<
   ProColumnType<T>,
-  'dataIndex' | 'valueType' | 'render' | 'search' | 'title' | 'valueEnum'
+  | 'dataIndex'
+  | 'valueType'
+  | 'render'
+  | 'search'
+  | 'title'
+  | 'valueEnum'
+  | 'editable'
+  | 'fieldProps'
+  | 'formItemProps'
 >;
 
 export type ProListMetas<T> = {
@@ -36,14 +46,16 @@ export type GetComponentProps<RecordType> = (
 
 export type ProListProps<RecordType, U extends ParamsType> = Omit<
   ProTableProps<RecordType, U>,
-  'size'
+  'size' | 'footer'
 > &
   AntdListProps<RecordType> & {
-    tooltip?: string;
+    tooltip?: LabelTooltipType | string;
     metas?: ProListMetas<RecordType>;
     showActions?: 'hover' | 'always';
     showExtra?: 'hover' | 'always';
     onRow?: GetComponentProps<RecordType>;
+    itemHeaderRender?: ItemProps<RecordType>['itemHeaderRender'];
+    itemTitleRender?: ItemProps<RecordType>['itemTitleRender'];
   };
 
 export type Key = React.Key;
@@ -52,7 +64,7 @@ export type TriggerEventHandler<RecordType> = (record: RecordType) => void;
 
 function ProList<
   RecordType extends Record<string, any>,
-  U extends Record<string, any> = Record<string, any>
+  U extends Record<string, any> = Record<string, any>,
 >(props: ProListProps<RecordType, U>) {
   const {
     metas: metals,
@@ -72,6 +84,9 @@ function ProList<
     renderItem,
     grid,
     onRow,
+    locale,
+    itemHeaderRender,
+    itemTitleRender,
     ...rest
   } = props;
 
@@ -118,50 +133,50 @@ function ProList<
       {...(rest as any)}
       actionRef={actionRef}
       pagination={propsPagination}
+      type="list"
       rowSelection={propRowSelection}
       search={search}
       options={options}
       className={classNames(prefixCls, className, listClassName)}
       columns={proTableColumns}
       rowKey={rowKey}
-      cardProps={{
-        bodyStyle: {
-          padding: 0,
-        },
-      }}
-      toolbar={{
-        style: {
-          padding: '0 24px',
-        },
-      }}
       tableViewRender={({ columns, size, pagination, rowSelection, dataSource, loading }) => {
         return (
-          <Form component={false}>
-            <ListView
-              grid={grid}
-              prefixCls={prefixCls}
-              columns={columns}
-              renderItem={renderItem}
-              actionRef={actionRef}
-              dataSource={(dataSource || []) as RecordType[]}
-              size={size as 'large'}
-              footer={footer}
-              split={split}
-              rowKey={rowKey}
-              expandable={expandable}
-              rowSelection={propRowSelection === false ? undefined : rowSelection}
-              showActions={showActions}
-              showExtra={showExtra}
-              pagination={pagination as PaginationProps}
-              itemLayout={itemLayout}
-              loading={loading}
-              onRow={onRow}
-            />
-          </Form>
+          <ListView
+            grid={grid}
+            itemTitleRender={itemTitleRender}
+            prefixCls={prefixCls}
+            columns={columns}
+            renderItem={renderItem}
+            actionRef={actionRef}
+            dataSource={(dataSource || []) as RecordType[]}
+            size={size as 'large'}
+            footer={footer}
+            split={split}
+            rowKey={rowKey}
+            expandable={expandable}
+            rowSelection={propRowSelection === false ? undefined : rowSelection}
+            showActions={showActions}
+            showExtra={showExtra}
+            pagination={pagination as PaginationProps}
+            itemLayout={itemLayout}
+            loading={loading}
+            itemHeaderRender={itemHeaderRender}
+            onRow={onRow}
+            locale={locale}
+          />
         );
       }}
     />
   );
 }
+
+function BaseProList<
+  RecordType extends Record<string, any>,
+  U extends Record<string, any> = Record<string, any>,
+>(props: ProListProps<RecordType, U>) {
+  return <ProList cardProps={false} search={false} toolBarRender={false} {...props} />;
+}
+export { BaseProList };
 
 export default ProList;

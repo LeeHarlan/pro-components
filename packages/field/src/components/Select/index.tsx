@@ -17,9 +17,8 @@ import type {
   ProSchemaValueEnumObj,
 } from '@ant-design/pro-utils';
 
-import { useDeepCompareEffect } from '@ant-design/pro-utils';
+import { useDeepCompareEffect, useMountMergeState } from '@ant-design/pro-utils';
 import useSWR, { mutate } from 'swr';
-import useMergedState from 'rc-util/lib/hooks/useMergedState';
 import { useIntl } from '@ant-design/pro-provider';
 
 import LightSelect from './LightSelect';
@@ -27,10 +26,11 @@ import SearchSelect from './SearchSelect';
 import type { ProFieldStatusType } from '../Status';
 import TableStatus, { ProFieldBadgeColor } from '../Status';
 import type { ProFieldFC } from '../../index';
+import './index.less';
 
 let testId = 0;
 
-export type FieldSelectProps = {
+export type FieldSelectProps<FieldProps = any> = {
   text: string;
   /** 值的枚举，如果存在枚举，Search 中会生成 select */
   valueEnum?: ProFieldValueEnumType;
@@ -41,7 +41,10 @@ export type FieldSelectProps = {
   params?: any;
 
   /** 组件的全局设置 */
-  fieldProps?: any;
+  fieldProps?: FieldProps;
+
+  bordered?: boolean;
+  id?: string;
 };
 
 export const ObjToMap = (value: ProFieldValueEnumType | undefined): ProSchemaValueEnumMap => {
@@ -113,22 +116,40 @@ const Highlight: React.FC<{
   label: string;
   words: string[];
 }> = ({ label, words }) => {
-  const reg = new RegExp(words.map((w) => w.replace(/\\/g, '\\\\')).join('|'), 'gi');
+  const REG_LIST = '.^$*+-?()[]{}\\|';
+  const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
+  const lightCls = getPrefixCls('pro-select-item-option-content-light');
+  const optionCls = getPrefixCls('pro-select-item-option-content');
+  const reg = new RegExp(
+    words
+      .map((word) => {
+        return word
+          .split('')
+          .map((w) => (REG_LIST.includes(w) ? `\\${w}` : w))
+          .join('');
+      })
+      .join('|'),
+    'gi',
+  );
   const token = label.replace(reg, '#@$&#');
   const elements = token.split('#').map((x) =>
     x[0] === '@'
       ? React.createElement(
           'span',
           {
-            style: {
-              color: '#1890ff',
-            },
+            className: lightCls,
           },
           x.slice(1),
         )
       : x,
   );
-  return React.createElement('div', null, ...elements);
+  return React.createElement(
+    'div',
+    {
+      className: optionCls,
+    },
+    ...elements,
+  );
 };
 
 /**
@@ -146,6 +167,39 @@ function getType(obj: any) {
   if (obj === null) return 'null'; // PhantomJS has type "DOMWindow" for null
   if (obj === undefined) return 'undefined'; // PhantomJS has type "DOMWindow" for undefined
   return type;
+}
+
+/**
+ * 递归筛选 item
+ *
+ * @param item
+ * @param keyWords
+ * @returns
+ */
+function filerByItem(
+  item: {
+    label: string;
+    value: string;
+    optionType: string;
+    children: any[];
+    options: any[];
+  },
+  keyWords?: string,
+) {
+  if (!keyWords) return true;
+  if (
+    item?.label?.toString().toLowerCase().includes(keyWords.toLowerCase()) ||
+    item?.value?.toString().toLowerCase().includes(keyWords.toLowerCase())
+  ) {
+    return true;
+  }
+  if (item.optionType === 'optGroup' && (item.children || item.options)) {
+    const findItem = [...(item.children || []), item.options || []].find((mapItem) => {
+      return filerByItem(mapItem, keyWords);
+    });
+    if (findItem) return true;
+  }
+  return false;
 }
 
 /**
@@ -179,14 +233,14 @@ export const proFieldParsingValueEnumToArray = (
 
     if (typeof value === 'object' && value?.text) {
       enumArray.push({
-        text: (value?.text as unknown) as string,
+        text: value?.text as unknown as string,
         value: key,
         disabled: value.disabled,
       });
       return;
     }
     enumArray.push({
-      text: (value as unknown) as string,
+      text: value as unknown as string,
       value: key,
     });
   });
@@ -222,7 +276,7 @@ export const useFieldFetchData = (
     }));
   }, []);
 
-  const [options, setOptions] = useMergedState<SelectProps<any>['options']>(
+  const [options, setOptions] = useMountMergeState<SelectProps<any>['options']>(
     () => {
       if (props.valueEnum) {
         return getOptionsFormValueEnum(props.valueEnum);
@@ -240,7 +294,7 @@ export const useFieldFetchData = (
     setOptions(getOptionsFormValueEnum(props.valueEnum));
   }, [props.valueEnum]);
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useMountMergeState(false);
 
   const fetchData = async () => {
     if (!props.request) {
@@ -280,17 +334,24 @@ export const useFieldFetchData = (
                 value: item,
               };
             }
+            if (item?.optionType === 'optGroup' && (item.children || item.options)) {
+              const childrenOptions = [...(item.children || []), ...(item.options || [])].filter(
+                (mapItem) => {
+                  return filerByItem(mapItem, keyWords);
+                },
+              );
+              return {
+                ...item,
+                children: childrenOptions,
+                options: childrenOptions,
+              };
+            }
             return item;
           })
           ?.filter((item) => {
+            if (!item) return false;
             if (!keyWords) return true;
-            if (
-              item?.label?.toString().toLowerCase().includes(keyWords.toLowerCase()) ||
-              item.value.toString().toLowerCase().includes(keyWords.toLowerCase())
-            ) {
-              return true;
-            }
-            return false;
+            return filerByItem(item as any, keyWords);
           }),
     (fetchKeyWords?: string) => {
       setKeyWords(fetchKeyWords);
@@ -320,6 +381,10 @@ const FieldSelect: ProFieldFC<FieldSelectProps> = (props, ref) => {
     children,
     light,
     proFieldKey,
+    params,
+    label,
+    bordered,
+    id,
     ...rest
   } = props;
 
@@ -359,7 +424,7 @@ const FieldSelect: ProFieldFC<FieldSelectProps> = (props, ref) => {
       <>
         {proFieldParsingText(
           rest.text,
-          (ObjToMap(valueEnum || optionsValueEnum) as unknown) as ProSchemaValueEnumObj,
+          ObjToMap(valueEnum || optionsValueEnum) as unknown as ProSchemaValueEnumObj,
         )}
       </>
     );
@@ -375,12 +440,15 @@ const FieldSelect: ProFieldFC<FieldSelectProps> = (props, ref) => {
       if (light) {
         return (
           <LightSelect
+            bordered={bordered}
+            id={id}
             loading={loading}
             ref={inputRef}
             allowClear
             size={size}
-            {...rest}
             options={options}
+            label={label}
+            placeholder={intl.getMessage('tableForm.selectPlaceholder', '请选择')}
             {...fieldProps}
           />
         );
@@ -391,6 +459,8 @@ const FieldSelect: ProFieldFC<FieldSelectProps> = (props, ref) => {
           style={{
             minWidth: 100,
           }}
+          bordered={bordered}
+          id={id}
           loading={loading}
           ref={inputRef}
           allowClear
@@ -406,8 +476,8 @@ const FieldSelect: ProFieldFC<FieldSelectProps> = (props, ref) => {
             }
             return item.label;
           }}
-          {...rest}
           placeholder={intl.getMessage('tableForm.selectPlaceholder', '请选择')}
+          label={label}
           {...fieldProps}
           options={options}
         />

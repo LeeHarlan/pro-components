@@ -1,20 +1,15 @@
-name: Node CI
-
+name: build-lib CI
 on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        node_version: [12.x]
-        os: [ubuntu-latest]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node_version }}
+      - name: Use Node.js 12.x
         uses: actions/setup-node@v1
         with:
-          node-version: ${{ matrix.node_version }}
+          node-version: 12.x
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -40,12 +35,6 @@ jobs:
           steps.cache-node-modules.outputs.cache-hit != 'true'
       - run: yarn run lint
       - run: yarn run tsc --noEmit
-      - run: yarn run build
+      - run: yarn run webpack
         env:
           PRO_COMPONENTS_CI: CI
-      - run: yarn run test
-        env:
-          CI: true
-          PROGRESS: none
-          NODE_ENV: test
-          NODE_OPTIONS: --max_old_space_size=4096

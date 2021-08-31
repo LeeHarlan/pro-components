@@ -17,11 +17,12 @@ const Group: React.FC<GroupProps> = React.forwardRef((props, ref: any) => {
     labelLayout,
     title = props.label,
     tooltip,
-    align,
+    align = 'start',
     direction,
     size = 32,
     titleStyle,
     titleRender,
+    spaceProps,
     extra,
   } = {
     ...groupProps,
@@ -59,6 +60,14 @@ const Group: React.FC<GroupProps> = React.forwardRef((props, ref: any) => {
     />
   );
   const titleDom = titleRender ? titleRender(label, props) : label;
+  const hiddenChildren: React.ReactNode[] = [];
+  const renderChild = React.Children.toArray(children).map((element) => {
+    if (React.isValidElement(element) && element?.props?.hidden) {
+      hiddenChildren.push(element);
+      return null;
+    }
+    return element;
+  });
 
   return (
     <div
@@ -68,6 +77,15 @@ const Group: React.FC<GroupProps> = React.forwardRef((props, ref: any) => {
       style={style}
       ref={ref}
     >
+      {hiddenChildren.length > 0 && (
+        <div
+          style={{
+            display: 'none',
+          }}
+        >
+          {hiddenChildren}
+        </div>
+      )}
       {(title || tooltip || extra) && (
         <div
           className={`${className}-title`}
@@ -94,8 +112,18 @@ const Group: React.FC<GroupProps> = React.forwardRef((props, ref: any) => {
         </div>
       )}
       {collapsible && collapsed ? null : (
-        <Space className={`${className}-container`} size={size} align={align} direction={direction}>
-          {children}
+        <Space
+          {...spaceProps}
+          className={`${className}-container`}
+          size={size}
+          align={align}
+          direction={direction}
+          style={{
+            rowGap: 0,
+            ...spaceProps?.style,
+          }}
+        >
+          {renderChild}
         </Space>
       )}
     </div>

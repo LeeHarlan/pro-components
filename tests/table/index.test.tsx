@@ -11,8 +11,10 @@ describe('BasicTable', () => {
   const LINE_STR_COUNT = 20;
   // Mock offsetHeight
   // @ts-expect-error
-  const originOffsetHeight = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetHeight')
-    .get;
+  const originOffsetHeight = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'offsetHeight',
+  ).get;
   Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
     get() {
       let html = this.innerHTML;
@@ -153,6 +155,35 @@ describe('BasicTable', () => {
 
     expect(html.find('.ant-btn.ant-btn-primary').text()).toBe('test');
     expect(html.find('.ant-btn').at(0).text()).toBe('test2');
+  });
+
+  it('🎏 ProTable support card props is false', async () => {
+    const html = mount(
+      <ProTable
+        size="small"
+        cardProps={false}
+        toolBarRender={false}
+        columns={[
+          {
+            dataIndex: 'money',
+            valueType: 'money',
+          },
+        ]}
+        dataSource={[]}
+        rowKey="key"
+      />,
+    );
+    await waitForComponentToPaint(html, 1200);
+
+    expect(html.find('.ant-card').exists()).toBe(false);
+
+    act(() => {
+      html.setProps({
+        cardProps: undefined,
+      });
+    });
+    await waitForComponentToPaint(html, 1200);
+    expect(html.find('.ant-card').exists()).toBe(true);
   });
 
   it('🎏 do not render setting', async () => {
@@ -880,7 +911,7 @@ describe('BasicTable', () => {
     });
     await waitForComponentToPaint(html, 1200);
     act(() => {
-      html.find('.ant-dropdown-menu-item').at(1).simulate('click');
+      html.find('li.ant-dropdown-menu-item').at(1).simulate('click');
     });
     await waitForComponentToPaint(html, 1200);
 
@@ -1015,6 +1046,68 @@ describe('BasicTable', () => {
     expect(fn).toBeCalledWith('name');
   });
 
+  it('🎏 search = true, name = test,onSearch return false', async () => {
+    const fn = jest.fn();
+    const html = mount(
+      <ProTable<
+        Record<string, any>,
+        {
+          test: string;
+        }
+      >
+        columns={[{ dataIndex: 'name' }]}
+        options={{
+          search: {
+            name: 'test',
+            onSearch: (keyword) => keyword !== 'name',
+          },
+        }}
+        request={async (params) => {
+          fn(params.test);
+          return { data: [] };
+        }}
+        rowKey="key"
+      />,
+    );
+    await waitForComponentToPaint(html, 1200);
+
+    act(() => {
+      html.find('.ant-pro-table-list-toolbar-search input').simulate('change', {
+        target: {
+          value: 'name',
+        },
+      });
+    });
+
+    act(() => {
+      html
+        .find('.ant-pro-table-list-toolbar-search input')
+        .simulate('keydown', { key: 'Enter', keyCode: 13 });
+    });
+
+    await waitForComponentToPaint(html, 600);
+
+    expect(fn).toBeCalledWith(undefined);
+
+    act(() => {
+      html.find('.ant-pro-table-list-toolbar-search input').simulate('change', {
+        target: {
+          value: 'name1',
+        },
+      });
+    });
+
+    act(() => {
+      html
+        .find('.ant-pro-table-list-toolbar-search input')
+        .simulate('keydown', { key: 'Enter', keyCode: 13 });
+    });
+
+    await waitForComponentToPaint(html, 200);
+
+    expect(fn).toBeCalledWith('name1');
+  });
+
   it('🎏 bordered = true', async () => {
     const html = mount(
       <ProTable
@@ -1086,7 +1179,7 @@ describe('BasicTable', () => {
     for (let i = 0; i < 10; i += 1) {
       ref.current?.reload();
     }
-    await waitForComponentToPaint(html, 500);
+    await waitForComponentToPaint(html, 2000);
 
     expect(fn).toBeCalledTimes(2);
   });

@@ -1,12 +1,18 @@
 /* eslint max-classes-per-file: ["error", 3] */
 import React, { useContext, useRef, useCallback, useMemo, useEffect } from 'react';
 import type { TablePaginationConfig } from 'antd';
-import { Table, ConfigProvider, Form, Card } from 'antd';
+import { Table, ConfigProvider, Card } from 'antd';
+
 import type { ParamsType } from '@ant-design/pro-provider';
 import { useIntl, ConfigProviderWrap } from '@ant-design/pro-provider';
 import classNames from 'classnames';
 import { stringify } from 'use-json-comparison';
-import type { TableCurrentDataSource, SorterResult, SortOrder } from 'antd/lib/table/interface';
+import type {
+  TableCurrentDataSource,
+  SorterResult,
+  SortOrder,
+  GetRowKey,
+} from 'antd/lib/table/interface';
 import {
   useDeepCompareEffect,
   omitUndefined,
@@ -39,6 +45,7 @@ import type {
 } from './typing';
 import type { ActionType } from '.';
 import { columnSort } from './utils/columnSort';
+import ProForm from '@ant-design/pro-form';
 
 function TableRender<T extends Record<string, any>, U, ValueType>(
   props: ProTableProps<T, U, ValueType> & {
@@ -58,11 +65,12 @@ function TableRender<T extends Record<string, any>, U, ValueType>(
     rowKey,
     tableClassName,
     action,
-    tableColumn,
+    tableColumn: tableColumns,
     type,
     pagination,
     rowSelection,
     size,
+    defaultSize,
     tableStyle,
     toolbarDom,
     searchNode,
@@ -81,17 +89,29 @@ function TableRender<T extends Record<string, any>, U, ValueType>(
   } = props;
   const counter = Container.useContainer();
 
+  /** 需要遍历一下，不然不支持嵌套表格 */
   const columns = useMemo(() => {
-    return tableColumn.filter((item) => {
-      // 删掉不应该显示的
-      const columnKey = genColumnKey(item.key, item.index);
-      const config = counter.columnsMap[columnKey];
-      if (config && config.show === false) {
-        return false;
-      }
-      return true;
-    });
-  }, [counter.columnsMap, tableColumn]);
+    const loopFilter = (column: any[]): any[] => {
+      return column
+        .map((item) => {
+          // 删掉不应该显示的
+          const columnKey = genColumnKey(item.key, item.index);
+          const config = counter.columnsMap[columnKey];
+          if (config && config.show === false) {
+            return false;
+          }
+          if (item.children) {
+            return {
+              ...item,
+              children: loopFilter(item.children),
+            };
+          }
+          return item;
+        })
+        .filter(Boolean);
+    };
+    return loopFilter(tableColumns);
+  }, [counter.columnsMap, tableColumns]);
 
   /** 如果所有列中的 filters=true| undefined 说明是用的是本地筛选 任何一列配置 filters=false，就能绕过这个判断 */
   const useLocaleFilter = useMemo(
@@ -166,7 +186,7 @@ function TableRender<T extends Record<string, any>, U, ValueType>(
         onSortChange(
           omitUndefined({
             [`${isSortByField ? sorterOfColumn : sorter.field}`]: sorter.order as SortOrder,
-          }),
+          }) || {},
         );
       }
     },
@@ -178,18 +198,7 @@ function TableRender<T extends Record<string, any>, U, ValueType>(
     props.tableLayout ?? props.columns?.some((item) => item.ellipsis) ? 'fixed' : 'auto';
 
   /** 默认的 table dom，如果是编辑模式，外面还要包个 form */
-  const baseTableDom = props.editable ? (
-    <Form
-      component={false}
-      form={props.editable?.form}
-      onValuesChange={editableUtils.onValuesChange}
-      key="table"
-    >
-      <Table<T> {...getTableProps()} rowKey={rowKey} tableLayout={tableLayout} />
-    </Form>
-  ) : (
-    <Table<T> {...getTableProps()} rowKey={rowKey} tableLayout={tableLayout} />
-  );
+  const baseTableDom = <Table<T> {...getTableProps()} rowKey={rowKey} tableLayout={tableLayout} />;
 
   /** 自定义的 render */
   const tableDom = props.tableViewRender
@@ -202,30 +211,52 @@ function TableRender<T extends Record<string, any>, U, ValueType>(
       )
     : baseTableDom;
 
-  /** Table 区域的 dom，为了方便 render */
-  const tableAreaDom = (
-    <Card
-      bordered={isBordered('table', cardBordered)}
-      style={{
-        height: '100%',
-      }}
-      bodyStyle={
-        toolbarDom
-          ? {
-              paddingTop: 0,
-              paddingBottom: 0,
-            }
-          : {
-              padding: 0,
-            }
-      }
-      {...cardProps}
-    >
+  const tableContentDom = (
+    <>
       {toolbarDom}
       {alertDom}
-      {tableDom}
-    </Card>
+      {props.editable ? (
+        <ProForm
+          {...props.editable?.formProps}
+          component={false}
+          form={props.editable?.form}
+          onValuesChange={editableUtils.onValuesChange}
+          key="table"
+          submitter={false}
+          omitNil={false}
+        >
+          {tableDom}
+        </ProForm>
+      ) : (
+        tableDom
+      )}
+    </>
   );
+  /** Table 区域的 dom，为了方便 render */
+  const tableAreaDom =
+    cardProps === false ? (
+      tableContentDom
+    ) : (
+      <Card
+        bordered={isBordered('table', cardBordered)}
+        style={{
+          height: '100%',
+        }}
+        bodyStyle={
+          toolbarDom
+            ? {
+                paddingTop: 0,
+                paddingBottom: 0,
+              }
+            : {
+                padding: 0,
+              }
+        }
+        {...cardProps}
+      >
+        {tableContentDom}
+      </Card>
+    );
 
   const renderTable = () => {
     if (props.tableRender) {
@@ -263,7 +294,7 @@ function TableRender<T extends Record<string, any>, U, ValueType>(
   }
   return (
     <ConfigProvider
-      getPopupContainer={() => ((rootRef.current || document.body) as any) as HTMLElement}
+      getPopupContainer={() => (rootRef.current || document.body) as any as HTMLElement}
     >
       {proTableDom}
     </ConfigProvider>
@@ -337,7 +368,9 @@ const ProTable = <T extends Record<string, any>, U extends ParamsType, ValueType
   const setSelectedRowsAndKey = useCallback(
     (keys: React.ReactText[], rows: T[]) => {
       setSelectedRowKeys(keys);
-      selectedRowsRef.current = rows;
+      if (!propsRowSelection || !propsRowSelection?.selectedRowKeys) {
+        selectedRowsRef.current = rows;
+      }
     },
     [setSelectedRowKeys],
   );
@@ -351,7 +384,9 @@ const ProTable = <T extends Record<string, any>, U extends ParamsType, ValueType
     return {};
   });
 
-  const [proFilter, setProFilter] = useMountMergeState<Record<string, React.ReactText[]>>({});
+  const [proFilter, setProFilter] = useMountMergeState<Record<string, React.ReactText[] | null>>(
+    {},
+  );
   const [proSort, setProSort] = useMountMergeState<Record<string, SortOrder>>({});
 
   /** 设置默认排序和筛选值 */
@@ -383,7 +418,7 @@ const ProTable = <T extends Record<string, any>, U extends ParamsType, ValueType
       };
       // eslint-disable-next-line no-underscore-dangle
       delete (actionParams as any)._timestamp;
-      const response = await request((actionParams as unknown) as U, proSort, proFilter);
+      const response = await request(actionParams as unknown as U, proSort, proFilter);
       return response as RequestData<T>;
     };
   }, [formSearch, params, proFilter, proSort, request]);
@@ -403,13 +438,45 @@ const ProTable = <T extends Record<string, any>, U extends ParamsType, ValueType
     debounceTime: props.debounceTime,
     onPageInfoChange: (pageInfo) => {
       // 总是触发一下 onChange 和  onShowSizeChange
-      if (propsPagination) {
+      // 目前只有 List 和 Table 支持分页, List 有分页的时候打断 Table 的分页
+      if (propsPagination && type !== 'list') {
         propsPagination?.onChange?.(pageInfo.current, pageInfo.pageSize);
         propsPagination?.onShowSizeChange?.(pageInfo.current, pageInfo.pageSize);
       }
     },
   });
   // ============================ END ============================
+
+  /** SelectedRowKeys受控处理selectRows */
+  const preserveRecordsRef = React.useRef(new Map<any, T>());
+
+  // ============================ RowKey ============================
+  const getRowKey = React.useMemo<GetRowKey<any>>(() => {
+    if (typeof rowKey === 'function') {
+      return rowKey;
+    }
+    return (record: T, index?: number) => (record as any)?.[rowKey as string] ?? index;
+  }, [rowKey]);
+
+  useMemo(() => {
+    if (action.dataSource?.length) {
+      const newCache = new Map<any, T>();
+      const keys = action.dataSource.map((data) => {
+        const dataRowKey = (data as any)?.[rowKey as string] ?? data?.key;
+        newCache.set(dataRowKey, data);
+        return dataRowKey;
+      });
+      preserveRecordsRef.current = newCache;
+      return keys;
+    }
+    return [];
+  }, [action.dataSource, rowKey]);
+
+  useEffect(() => {
+    selectedRowsRef.current = selectedRowKeys?.map(
+      (key): T => preserveRecordsRef.current?.get(key) as T,
+    );
+  }, [selectedRowKeys]);
 
   /** 页面编辑的计算 */
   const pagination = useMemo(() => {
@@ -436,6 +503,7 @@ const ProTable = <T extends Record<string, any>, U extends ParamsType, ValueType
       },
     };
     return mergePagination<T>(propsPagination, pageConfig, intl);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [propsPagination, action, intl]);
 
   const counter = Container.useContainer();
@@ -450,14 +518,6 @@ const ProTable = <T extends Record<string, any>, U extends ParamsType, ValueType
 
   counter.setAction(actionRef.current);
   counter.propsRef.current = props;
-
-  // ============================ RowKey ============================
-  const getRowKey = React.useMemo<any>(() => {
-    if (typeof rowKey === 'function') {
-      return rowKey;
-    }
-    return (record: T, index: number) => (record as any)?.[rowKey as string] ?? index;
-  }, [rowKey]);
 
   /** 可编辑行的相关配置 */
   const editableUtils = useEditableArray<any>({
@@ -523,8 +583,14 @@ const ProTable = <T extends Record<string, any>, U extends ParamsType, ValueType
       editableUtils,
     }).sort(columnSort(counter.columnsMap));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [propsColumns, counter, columnEmptyText, type, editableUtils.editableKeys.join(',')]);
-
+  }, [
+    propsColumns,
+    counter,
+    columnEmptyText,
+    type,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    editableUtils.editableKeys && editableUtils.editableKeys.join(','),
+  ]);
   /** Table Column 变化的时候更新一下，这个参数将会用于渲染 */
   useDeepCompareEffect(() => {
     if (tableColumn && tableColumn.length > 0) {
@@ -537,11 +603,11 @@ const ProTable = <T extends Record<string, any>, U extends ParamsType, ValueType
   /** 同步 Pagination，支持受控的 页码 和 pageSize */
   useDeepCompareEffect(() => {
     const { pageInfo } = action;
-    const { current = pageInfo.current, pageSize = pageInfo.pageSize } = propsPagination || {};
+    const { current = pageInfo?.current, pageSize = pageInfo?.pageSize } = propsPagination || {};
     if (
       propsPagination &&
       (current || pageSize) &&
-      (pageSize !== pageInfo.pageSize || current !== pageInfo.current)
+      (pageSize !== pageInfo?.pageSize || current !== pageInfo?.current)
     ) {
       action.setPageInfo({
         pageSize: pageSize || pageInfo.pageSize,
@@ -618,6 +684,7 @@ const ProTable = <T extends Record<string, any>, U extends ParamsType, ValueType
         onCleanSelected={onCleanSelected}
         alertOptionRender={rest.tableAlertOptionRender}
         alertInfoRender={tableAlertRender}
+        alwaysShowAlert={propsRowSelection?.alwaysShowAlert}
       />
     ) : null;
 
@@ -649,18 +716,21 @@ const ProTable = <T extends Record<string, any>, U extends ParamsType, ValueType
  * @param props
  */
 const ProviderWarp = <
-  T extends Record<string, any>,
-  U extends ParamsType = ParamsType,
-  ValueType = 'text'
+  DataType extends Record<string, any>,
+  Params extends ParamsType = ParamsType,
+  ValueType = 'text',
 >(
-  props: ProTableProps<T, U, ValueType>,
+  props: ProTableProps<DataType, Params, ValueType>,
 ) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   return (
     <Container.Provider initialState={props}>
       <ConfigProviderWrap>
         <ErrorBoundary>
-          <ProTable<T, U, ValueType> defaultClassName={getPrefixCls('pro-table')} {...props} />
+          <ProTable<DataType, Params, ValueType>
+            defaultClassName={getPrefixCls('pro-table')}
+            {...props}
+          />
         </ErrorBoundary>
       </ConfigProviderWrap>
     </Container.Provider>

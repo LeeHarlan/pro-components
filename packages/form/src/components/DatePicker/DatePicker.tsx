@@ -1,8 +1,7 @@
 import React from 'react';
-import ProField from '@ant-design/pro-field';
+import ProFormField from '../Field';
 import type { DatePickerProps } from 'antd';
-import createField from '../../BaseForm/createField';
-import type { ProFormItemProps } from '../../interface';
+import type { ProFormFieldItemProps } from '../../interface';
 
 const valueType = 'date';
 /**
@@ -10,20 +9,21 @@ const valueType = 'date';
  *
  * @param
  */
-const ProFormDatePicker: React.FC<
-  ProFormItemProps<DatePickerProps>
-> = React.forwardRef(({ proFieldProps, fieldProps }, ref) => (
-  <ProField
-    ref={ref}
-    text={fieldProps?.value}
-    mode="edit"
-    valueType={valueType}
-    fieldProps={fieldProps}
-    {...proFieldProps}
-  />
-));
+const ProFormDatePicker: React.FC<ProFormFieldItemProps<DatePickerProps>> = React.forwardRef(
+  ({ proFieldProps, fieldProps, ...rest }, ref) => (
+    <ProFormField
+      ref={ref}
+      mode="edit"
+      valueType={valueType}
+      fieldProps={fieldProps}
+      proFieldProps={proFieldProps}
+      filedConfig={{
+        valueType,
+        customLightMode: true,
+      }}
+      {...rest}
+    />
+  ),
+);
 
-export default createField<ProFormItemProps<DatePickerProps>>(ProFormDatePicker, {
-  valueType,
-  customLightMode: true,
-});
+export default ProFormDatePicker;

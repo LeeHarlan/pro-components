@@ -32,8 +32,10 @@ describe('BasicTable Search', () => {
   const LINE_STR_COUNT = 20;
   // Mock offsetHeight
   // @ts-expect-error
-  const originOffsetHeight = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetHeight')
-    .get;
+  const originOffsetHeight = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'offsetHeight',
+  ).get;
   Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
     get() {
       let html = this.innerHTML;
@@ -493,9 +495,13 @@ describe('BasicTable Search', () => {
             dataIndex: 'money',
             valueType: 'money',
             fieldProps: {
-              onChange: (e: any) => onChangeFn(e.target.value),
+              onChange: (e: any) => {
+                onChangeFn(e.target.value);
+              },
             },
-            renderFormItem: () => <Input id="renderFormItem" />,
+            renderFormItem: () => {
+              return <Input id="renderFormItem" />;
+            },
           },
           {
             title: 'Name',
@@ -515,9 +521,9 @@ describe('BasicTable Search', () => {
     );
     await waitForComponentToPaint(html, 1200);
 
-    expect(html.find('#renderFormItem').exists()).toBeTruthy();
+    expect(html.find('input#renderFormItem').exists()).toBeTruthy();
     act(() => {
-      html.find('#renderFormItem input').simulate('change', {
+      html.find('input#renderFormItem').simulate('change', {
         target: {
           value: '12',
         },
@@ -525,7 +531,6 @@ describe('BasicTable Search', () => {
     });
     expect(onChangeFn).toBeCalledWith('12');
     expect(fn).toBeCalledWith('12');
-
     act(() => {
       html.unmount();
     });
@@ -560,20 +565,21 @@ describe('BasicTable Search', () => {
     );
     await waitForComponentToPaint(html, 1200);
     expect(html.find('div.ant-form-item').length).toBe(2);
-
-    html.setProps({
-      columns: [
-        {
-          title: '金额',
-          dataIndex: 'money',
-          valueType: 'money',
-        },
-        {
-          title: 'Name',
-          key: 'name',
-          dataIndex: 'name',
-        },
-      ],
+    act(() => {
+      html.setProps({
+        columns: [
+          {
+            title: '金额',
+            dataIndex: 'money',
+            valueType: 'money',
+          },
+          {
+            title: 'Name',
+            key: 'name',
+            dataIndex: 'name',
+          },
+        ],
+      });
     });
 
     await waitForComponentToPaint(html, 200);

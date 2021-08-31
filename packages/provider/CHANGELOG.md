@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.17](https://github.com/ant-design/pro-components/compare/@ant-design/pro-provider@1.4.16...@ant-design/pro-provider@1.4.17) (2021-08-24)
+
+**Note:** Version bump only for package @ant-design/pro-provider
+
+## [1.4.16](https://github.com/ant-design/pro-components/compare/@ant-design/pro-provider@1.4.15...@ant-design/pro-provider@1.4.16) (2021-07-19)
+
+### Bug Fixes
+
+- **form:** proformUploadDragger padding ([#3251](https://github.com/ant-design/pro-components/issues/3251)) ([3b2b43c](https://github.com/ant-design/pro-components/commit/3b2b43c050e324c92beb22f314a98dbab2988f06))
+
+## [1.4.15](https://github.com/ant-design/pro-components/compare/@ant-design/pro-provider@1.4.14...@ant-design/pro-provider@1.4.15) (2021-07-01)
+
+**Note:** Version bump only for package @ant-design/pro-provider
+
+## [1.4.14](https://github.com/ant-design/pro-components/compare/@ant-design/pro-provider@1.4.13...@ant-design/pro-provider@1.4.14) (2021-06-17)
+
+### Bug Fixes
+
+- **form:** switch width style fixed ([4e7543d](https://github.com/ant-design/pro-components/commit/4e7543daca5c5da3cfef2761737301e392a41cac))
+
+## [1.4.13](https://github.com/ant-design/pro-components/compare/@ant-design/pro-provider@1.4.12...@ant-design/pro-provider@1.4.13) (2021-06-08)
+
+**Note:** Version bump only for package @ant-design/pro-provider
+
+## [1.4.12](https://github.com/ant-design/pro-components/compare/@ant-design/pro-provider@1.4.11...@ant-design/pro-provider@1.4.12) (2021-04-29)
+
+**Note:** Version bump only for package @ant-design/pro-provider
+
 ## [1.4.11](https://github.com/ant-design/pro-components/compare/@ant-design/pro-provider@1.4.10...@ant-design/pro-provider@1.4.11) (2021-04-19)
 
 **Note:** Version bump only for package @ant-design/pro-provider

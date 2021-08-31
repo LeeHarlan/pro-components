@@ -24,6 +24,8 @@ const tailPkgList = pkgList
 
 const isProduction = process.env.NODE_ENV === 'production';
 
+const isDeploy = process.env.SITE_DEPLOY === 'TRUE';
+
 export default {
   title: 'ProComponents',
   mode: 'site',
@@ -50,7 +52,7 @@ export default {
     },
     {
       property: 'og:description',
-      content: '🏆 Use Ant Design like a Pro!',
+      content: '🏆 让中后台开发更简单',
     },
     {
       name: 'keywords',
@@ -58,18 +60,22 @@ export default {
     },
     {
       name: 'description',
-      content: '🏆 Use Ant Design like a Pro! 包含 table form 等多个组件。',
+      content: '🏆 让中后台开发更简单 包含 table form 等多个组件。',
     },
     {
       name: 'apple-mobile-web-app-capable',
       content: 'yes',
     },
     {
-      name: 'apple-mobile-web-app-status-bar-style"',
+      name: 'apple-mobile-web-app-status-bar-style',
       content: 'black-translucent',
     },
+    {
+      name: 'theme-color',
+      content: '#1890ff',
+    },
   ],
-  alias,
+  alias: process.env === 'development' ? alias : {},
   // 用于切换 antd 暗黑模式
   // antd: {
   //   dark: true,
@@ -103,9 +109,7 @@ export default {
       }
     : false,
   hash: true,
-  ssr: {
-    devServerRender: false,
-  },
+  ssr: isDeploy ? {} : undefined,
   exportStatic: {},
   targets: {
     chrome: 80,
@@ -176,6 +180,7 @@ export default {
           'form',
           'FieldSet/index',
           'Group/index',
+          'SchemaForm/index',
           'QueryFilter/index',
           'StepsForm/index',
           'ModalForm/index',
@@ -192,5 +197,6 @@ export default {
     ],
   },
   webpack5: {},
+  mfsu: !isDeploy ? {} : undefined,
   fastRefresh: {},
 };

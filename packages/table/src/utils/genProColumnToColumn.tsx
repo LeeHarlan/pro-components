@@ -25,7 +25,7 @@ export function genProColumnToColumn<T>(props: {
   editableUtils: UseEditableUtilType;
 }): (TableColumnType<T> & { index?: number })[] {
   const { columns, counter, columnEmptyText, type, editableUtils } = props;
-  return (columns
+  return columns
     .map((columnProps, columnsIndex) => {
       const {
         key,
@@ -36,7 +36,7 @@ export function genProColumnToColumn<T>(props: {
         onFilter,
         filters = [],
       } = columnProps as ProColumnGroupType<T, any>;
-      const columnKey = genColumnKey(key, columnsIndex);
+      const columnKey = genColumnKey(key || dataIndex?.toString(), columnsIndex);
       // 这些都没有，说明是普通的表格不需要 pro 管理
       const noNeedPro = !valueEnum && !valueType && !children;
       if (noNeedPro) {
@@ -45,17 +45,18 @@ export function genProColumnToColumn<T>(props: {
           ...columnProps,
         };
       }
-      const { propsRef } = counter;
       const config = counter.columnsMap[columnKey] || { fixed: columnProps.fixed };
 
       const genOnFilter = () => {
-        if (!propsRef.current?.request || onFilter === true) {
+        if (onFilter === true) {
           return (value: string, row: T) => defaultOnFilter(value, row, dataIndex as string[]);
         }
         return omitBoolean(onFilter);
       };
+
       const tempColumns = {
         index: columnsIndex,
+        key: columnKey,
         ...columnProps,
         title: renderColumnsTitle(columnProps),
         valueEnum,
@@ -91,7 +92,7 @@ export function genProColumnToColumn<T>(props: {
       };
       return omitUndefinedAndEmptyArr(tempColumns);
     })
-    .filter((item) => !item.hideInTable) as unknown) as (TableColumnType<T> & {
+    .filter((item) => !item.hideInTable) as unknown as (TableColumnType<T> & {
     index?: number;
   })[];
 }

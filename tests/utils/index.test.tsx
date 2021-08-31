@@ -9,6 +9,7 @@ import {
   useDebounceFn,
   pickProProps,
   DropdownFooter,
+  LabelIconTip,
 } from '@ant-design/pro-utils';
 import { mount } from 'enzyme';
 import { Form, Input } from 'antd';
@@ -16,6 +17,8 @@ import type { Moment } from 'moment';
 import moment from 'moment';
 import { act } from 'react-dom/test-utils';
 import { waitTime, waitForComponentToPaint } from '../util';
+import isDropdownValueType from '../../packages/utils/src/isDropdownValueType/index';
+import { CodeFilled } from '@ant-design/icons';
 
 describe('utils', () => {
   it('📅 useDebounceFn', async () => {
@@ -322,7 +325,6 @@ describe('utils', () => {
       });
     });
     await waitForComponentToPaint(html, 1000);
-    expect(html.find('div.ant-popover.ant-popover-hidden').exists()).toBeTruthy();
 
     act(() => {
       html.find('Input#test').simulate('change', {
@@ -506,6 +508,32 @@ describe('utils', () => {
     expect((html as any).dateRange2).toBe('2019-11-16 12:55:26');
   });
 
+  it('📅 transformKeySubmitValue return nest object', async () => {
+    const html = transformKeySubmitValue(
+      {
+        a: {
+          b: {
+            name: 'test',
+          },
+        },
+      },
+      {
+        a: {
+          b: {
+            name: (e: string) => ({
+              a: {
+                b: {
+                  name: `qixian_${e}`,
+                },
+              },
+            }),
+          } as any,
+        },
+      },
+    );
+    expect(html.a.b.name).toBe('qixian_test');
+  });
+
   it('📅 transformKeySubmitValue return array', async () => {
     const html = transformKeySubmitValue(
       {
@@ -565,7 +593,7 @@ describe('utils', () => {
     });
     expect(html['new-dataTime']).toBe('2019-11-16 12:50:26');
     expect(html.tag).not.toBe(labelInValue);
-    expect(html.tag.label).toBe(labelInValue.label);
+    expect(React.isValidElement(html.tag.label)).toBeTruthy();
   });
 
   it('📅 transformKeySubmitValue ignore Blob', async () => {
@@ -615,5 +643,32 @@ describe('utils', () => {
     );
     expect(isUrl('procomponents.ant.design/en-US/components/layout')).toBe(false);
     expect(isUrl('https:://procomponents.ant.design/en-US/components/layout')).toBe(false);
+  });
+
+  it('isDropdownValueType', async () => {
+    expect(isDropdownValueType('date')).toBeTruthy();
+    expect(isDropdownValueType('dateRange')).toBeFalsy();
+    expect(isDropdownValueType('dateTimeRange')).toBeFalsy();
+    expect(isDropdownValueType('timeRange')).toBeFalsy();
+    expect(isDropdownValueType('select')).toBeTruthy();
+  });
+  it('LabelIconTip', async () => {
+    const html = mount(
+      <LabelIconTip
+        label="xxx"
+        subTitle="xxx"
+        tooltip={{
+          icon: <CodeFilled />,
+        }}
+      />,
+    );
+
+    act(() => {
+      html.find('div').at(0).simulate('mousedown');
+      html.find('div').at(0).simulate('mouseleave');
+      html.find('div').at(0).simulate('mousemove');
+    });
+
+    expect(html.render()).toMatchSnapshot();
   });
 });

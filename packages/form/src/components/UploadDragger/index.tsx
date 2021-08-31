@@ -2,10 +2,10 @@ import React, { useContext } from 'react';
 import { Upload, ConfigProvider } from 'antd';
 import type { DraggerProps, UploadProps } from 'antd/lib/upload';
 import { InboxOutlined } from '@ant-design/icons';
-import type { ProFormItemProps } from '../../interface';
+import type { ProFormFieldItemProps } from '../../interface';
 import createField from '../../BaseForm/createField';
 
-export type ProFormDraggerProps = ProFormItemProps<DraggerProps> & {
+export type ProFormDraggerProps = ProFormFieldItemProps<DraggerProps> & {
   icon?: React.ReactNode;
   title?: React.ReactNode;
   action?: UploadProps['action'];
@@ -54,9 +54,7 @@ const ProFormUploadDragger: React.FC<ProFormDraggerProps> = React.forwardRef(
         fileList={value}
         {...fieldProps}
         onChange={(info) => {
-          if (onChange) {
-            onChange(info);
-          }
+          onChange?.(info);
           if (fieldProps?.onChange) {
             fieldProps?.onChange(info);
           }
@@ -66,13 +64,16 @@ const ProFormUploadDragger: React.FC<ProFormDraggerProps> = React.forwardRef(
         <p className={`${baseClassName}-drag-icon`}>{icon}</p>
         <p className={`${baseClassName}-text`}>{title}</p>
         <p className={`${baseClassName}-hint`}>{description}</p>
-        <div
-          style={{
-            padding: 16,
-          }}
-        >
-          {children}
-        </div>
+        {children ? (
+          <div
+            className={`${baseClassName}-extra`}
+            style={{
+              padding: 16,
+            }}
+          >
+            {children}
+          </div>
+        ) : null}
       </Upload.Dragger>
     );
   },

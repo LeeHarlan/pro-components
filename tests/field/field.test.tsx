@@ -8,10 +8,35 @@ import Field from '@ant-design/pro-field';
 import Demo from './fixtures/demo';
 import { waitForComponentToPaint, waitTime } from '../util';
 
+const domRef = React.createRef();
+
 describe('Field', () => {
   it('🐴 base use', async () => {
     const html = render(<Field text="100" valueType="money" mode="edit" />);
     expect(html).toMatchSnapshot();
+  });
+
+  it('🐴 money onchange values', async () => {
+    const html = mount(<Field text="100" valueType="money" mode="edit" />);
+    act(() => {
+      html.find('input').simulate('change', {
+        target: {
+          value: 1000,
+        },
+      });
+    });
+    html.update();
+    expect(html.find('input').props().value).toBe('￥ 1000');
+    act(() => {
+      html.find('input').simulate('change', {
+        target: {
+          value: '￥ 100',
+        },
+      });
+    });
+
+    html.update();
+    expect(html.find('input').props().value).toBe('￥ 100');
   });
 
   it('🐴 percent=0', async () => {
@@ -89,6 +114,7 @@ describe('Field', () => {
           text="default"
           valueType={valueType as 'radio'}
           mode="read"
+          ref={domRef}
           render={(text, _, dom) => <>pre{dom}</>}
           valueEnum={{
             default: { text: '关闭', status: 'Default' },
@@ -336,6 +362,7 @@ describe('Field', () => {
     it(`🐴 valueType support render ${valueType}`, async () => {
       const html = render(
         <Field
+          ref={domRef}
           text="1994-07-29 12:00:00"
           mode="read"
           valueType={valueType as 'text'}
@@ -528,6 +555,84 @@ describe('Field', () => {
     );
     expect(html.text()).toBe('- 100.0%');
   });
+  it('🐴 percent prefix="???" onchange values', async () => {
+    const html = mount(
+      <Field
+        text="100"
+        valueType={{
+          type: 'percent',
+        }}
+        prefix="???"
+        mode="read"
+      />,
+    );
+    // read test
+    expect(html.text()).toBe('???100.00%');
+    // change edit mode
+    html.setProps({
+      mode: 'edit',
+    });
+    // edit test
+    act(() => {
+      html.find('.ant-input-number-input').simulate('change', {
+        target: {
+          value: '123',
+        },
+      });
+    });
+    html.update();
+    expect(html.find('input').props().value).toBe('??? 123');
+    act(() => {
+      html.find('.ant-input-number-input').simulate('change', {
+        target: {
+          value: '123456',
+        },
+      });
+    });
+    html.update();
+    expect(html.find('input').props().value).toBe('??? 123,456');
+  });
+  it('🐴 percent magic prefix onchange values', async () => {
+    const words = '1234567890 ~!@#$%^&*()_+{}:"?> <?>L:'.split('');
+    const magicPrefix = words
+      .map(() => words[Math.floor(Math.random() * words.length - 1)])
+      .join('');
+    const html = mount(
+      <Field
+        text="100"
+        valueType={{
+          type: 'percent',
+        }}
+        prefix={magicPrefix}
+        mode="read"
+      />,
+    );
+    // read test
+    expect(html.text()).toBe(`${magicPrefix}100.00%`);
+    // change edit mode
+    html.setProps({
+      mode: 'edit',
+    });
+    // edit test
+    act(() => {
+      html.find('.ant-input-number-input').simulate('change', {
+        target: {
+          value: '123',
+        },
+      });
+    });
+    html.update();
+    expect(html.find('input').props().value).toBe(`${magicPrefix} 123`);
+    act(() => {
+      html.find('.ant-input-number-input').simulate('change', {
+        target: {
+          value: '123456',
+        },
+      });
+    });
+    html.update();
+    expect(html.find('input').props().value).toBe(`${magicPrefix} 123,456`);
+  });
 
   it('🐴 password support visible', async () => {
     const html = mount(<Field text={123456} valueType="password" mode="read" />);
@@ -537,49 +642,6 @@ describe('Field', () => {
     });
     await waitForComponentToPaint(html);
     expect(html.find('span.anticon-eye').exists()).toBeTruthy();
-  });
-
-  it('🐴 valueType=text', async () => {
-    const html = mount(
-      <Field
-        text="100"
-        fieldProps={{
-          composition: true,
-        }}
-        valueType="text"
-        mode="edit"
-      />,
-    );
-    await waitForComponentToPaint(html);
-    html.find('input').simulate('compositionstart', {
-      target: {
-        value: 'xxx',
-      },
-    });
-    await waitForComponentToPaint(html);
-
-    html.find('input').simulate('change', {
-      target: {
-        value: 'xxx',
-      },
-    });
-
-    await waitForComponentToPaint(html);
-
-    html.find('input').simulate('compositionend', {
-      target: {
-        value: 'xxx',
-      },
-    });
-
-    await waitForComponentToPaint(html);
-
-    html.find('input').simulate('change', {
-      target: {
-        value: 'xxx',
-      },
-    });
-    expect(html.find('input').props().value).toBe('xxx');
   });
 
   it('🐴 password support controlled visible', async () => {
@@ -696,5 +758,32 @@ describe('Field', () => {
       />,
     );
     expect(html.text()).toBe('2');
+  });
+
+  it(`🐴 valueType digit support formatter`, async () => {
+    const html = render(
+      <Field
+        text={10000}
+        mode="read"
+        valueType="digit"
+        fieldProps={{
+          formatter: (value: string) => `$${value}`,
+        }}
+      />,
+    );
+    expect(html.text()).toBe('$￥ 10000');
+  });
+
+  it(`🐴 text render null`, async () => {
+    const html = render(
+      <Field
+        text={10000}
+        mode="read"
+        // @ts-ignore
+        render={() => undefined}
+        emptyText="-"
+      />,
+    );
+    expect(html.text()).toBe('-');
   });
 });

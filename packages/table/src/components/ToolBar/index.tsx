@@ -5,7 +5,6 @@ import { Tooltip } from 'antd';
 import type { SearchProps } from 'antd/lib/input';
 import type { IntlType } from '@ant-design/pro-provider';
 import { useIntl } from '@ant-design/pro-provider';
-import isDeepEqualReact from 'fast-deep-equal/es6/react';
 import type { ListToolBarProps } from '../ListToolBar';
 import ListToolBar from '../ListToolBar';
 import ColumnSetting from '../ColumnSetting';
@@ -14,7 +13,13 @@ import FullScreenIcon from './FullscreenIcon';
 import DensityIcon from './DensityIcon';
 import Container from '../../container';
 import type { ActionType, ProTableProps } from '../../typing';
-import { omitUndefined } from '@ant-design/pro-utils';
+import { omitUndefined, isDeepEqualReact } from '@ant-design/pro-utils';
+import type { LabelTooltipType } from 'antd/lib/form/FormItemLabel';
+
+type OptionSearchProps = Omit<SearchProps, 'onSearch'> & {
+  /** 如果 onSearch 返回一个false，直接拦截请求 */
+  onSearch?: (keyword: string) => boolean | undefined;
+};
 
 export type OptionConfig = {
   density?: boolean;
@@ -26,7 +31,7 @@ export type OptionConfig = {
         draggable?: boolean;
         checkable?: boolean;
       };
-  search?: (SearchProps & { name?: string }) | boolean;
+  search?: (OptionSearchProps & { name?: string }) | boolean;
 };
 
 export type OptionsType =
@@ -35,7 +40,7 @@ export type OptionsType =
 
 export type ToolBarProps<T = unknown> = {
   headerTitle?: React.ReactNode;
-  tooltip?: string;
+  tooltip?: string | LabelTooltipType;
   /** @deprecated 你可以使用 tooltip，这个更改是为了与 antd 统一 */
   tip?: string;
   toolbar?: ListToolBarProps;
@@ -164,9 +169,8 @@ function ToolBar<T>({
 
     const options = {
       ...defaultOptions,
-      ...(propsOptions || {
-        fullScreen: false,
-      }),
+      fullScreen: false,
+      ...propsOptions,
     };
 
     return renderDefaultOption<T>(
@@ -208,6 +212,7 @@ function ToolBar<T>({
       onSearch?.('');
     }
   }, [counter.keyWords, onSearch]);
+
   return (
     <ListToolBar
       title={headerTitle}
@@ -226,7 +231,7 @@ export type ToolbarRenderProps<T> = {
   onFormSearchSubmit: (params: any) => void;
   searchNode: React.ReactNode;
   tableColumn: any[];
-  tooltip?: string;
+  tooltip?: string | LabelTooltipType;
   selectedRows: T[];
   selectedRowKeys: React.Key[];
   headerTitle: React.ReactNode;
@@ -240,10 +245,16 @@ export type ToolbarRenderProps<T> = {
 class ToolbarRender<T> extends React.Component<ToolbarRenderProps<T>> {
   onSearch = (keyword: string) => {
     const { options, onFormSearchSubmit, actionRef } = this.props;
+
     if (!options || !options.search) {
       return;
     }
     const { name = 'keyword' } = options.search === true ? {} : options.search;
+
+    /** 如果传入的 onSearch 返回值为 false，应该直接拦截请求 */
+    const success = (options.search as OptionSearchProps)?.onSearch?.(keyword);
+
+    if (success === false) return;
 
     // 查询的时候的回到第一页
     actionRef?.current?.setPageInfo?.({

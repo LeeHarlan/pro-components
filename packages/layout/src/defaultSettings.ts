@@ -1,4 +1,4 @@
-import { MenuDataItem } from '@umijs/route-utils';
+import type { MenuDataItem } from '@umijs/route-utils';
 import type { MenuTheme } from 'antd/lib/menu/MenuContext';
 
 export type ContentWidth = 'Fluid' | 'Fixed';
@@ -29,6 +29,7 @@ export type PureSettings = {
   menu?: {
     locale?: boolean;
     defaultOpenAll?: boolean;
+    ignoreFlatMenu?: boolean; // 是否忽略用户手动折叠过的菜单状态，如选择忽略，折叠按钮切换之后也可实现展开所有菜单
     loading?: boolean;
     onLoadingChange?: (loading?: boolean) => void;
     params?: Record<string, any>;
@@ -70,9 +71,6 @@ const defaultSettings: ProSettings = {
   contentWidth: 'Fluid',
   fixedHeader: false,
   fixSiderbar: false,
-  menu: {
-    locale: true,
-  },
   headerHeight: 48,
   title: 'Ant Design Pro',
   iconfontUrl: '',

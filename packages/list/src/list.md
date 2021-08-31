@@ -32,6 +32,10 @@ nav:
 
 <code src="./demos/selectedRow.tsx" background="#f5f5f5" title="支持选中的列表"/>
 
+### 查询列表
+
+<code src="./demos/search.tsx" background="#f5f5f5" title="查询列表" />
+
 ### 带筛选和异步请求的列表
 
 <code src="./demos/filter.tsx" background="#f5f5f5" title="带筛选和异步请求的列表" />
@@ -75,6 +79,11 @@ ProList 与 antd 的 [List](https://ant.design/components/list-cn/) 相比，API
 | showActions | 何时展示 actions | `'hover'` \| `'always'` | `'always'` |
 | showExtra | 何时展示 extra | `'hover'` \| `'always'` | `'always'` |
 | onRow | 与 antd 相同的[配置](https://ant.design/components/table-cn/#onRow-%E7%94%A8%E6%B3%95) | `function(record, index)` | - |
+| itemHeaderRender | 自定义每一列的 header，与 itemRender 不同的时，它会保留多选和展开收起 | - | - |
+
+### 批量操作
+
+与 ProTable 相同的[配置](https://procomponents.ant.design/components/table/#%E6%89%B9%E9%87%8F%E6%93%8D%E4%BD%9C)。
 
 ### Metas.[Meta] 通用 API
 

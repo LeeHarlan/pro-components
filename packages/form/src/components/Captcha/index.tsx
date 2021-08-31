@@ -1,11 +1,11 @@
 ﻿import type { ButtonProps, InputProps } from 'antd';
 import { Button, Input, Form } from 'antd';
 import type { NamePath } from 'antd/lib/form/interface';
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import createField from '../../BaseForm/createField';
-import type { ProFormItemProps } from '../../interface';
+import type { ProFormFieldItemProps } from '../../interface';
 
-export type ProFormCaptchaProps = ProFormItemProps<InputProps> & {
+export type ProFormCaptchaProps = ProFormFieldItemProps<InputProps> & {
   /** @name 倒计时的秒数 */
   countDown?: number;
 
@@ -39,23 +39,22 @@ const ProFormCaptcha: React.FC<ProFormCaptchaProps> = React.forwardRef((props, r
       return paramsTiming ? `${paramsCount} 秒后重新获取` : '获取验证码';
     },
     captchaProps,
-    value,
-    onChange,
     ...restProps
   } = props;
 
-  const onGetCaptcha = useCallback(async (mobile: string) => {
+  const onGetCaptcha = async (mobile: string) => {
     try {
       setLoading(true);
       await restProps.onGetCaptcha(mobile);
       setLoading(false);
       setTiming(true);
     } catch (error) {
+      setTiming(false);
       setLoading(false);
       // eslint-disable-next-line no-console
       console.log(error);
     }
-  }, []);
+  };
 
   useEffect(() => {
     let interval: number = 0;
@@ -94,8 +93,6 @@ const ProFormCaptcha: React.FC<ProFormCaptchaProps> = React.forwardRef((props, r
               transition: 'width .3s',
               marginRight: 8,
             }}
-            value={value}
-            onChange={onChange}
           />
           <Button
             style={{

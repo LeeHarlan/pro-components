@@ -22,6 +22,7 @@ Array [
       class="ant-pro-card-body"
     >
       <form
+        autocomplete="off"
         class="ant-form ant-form-vertical"
         title="自定义 valueType"
       >
@@ -38,7 +39,8 @@ Array [
             标签
           </div>
           <div
-            class="ant-space ant-space-horizontal ant-space-align-center ant-pro-form-group-container"
+            class="ant-space ant-space-horizontal ant-space-align-start ant-pro-form-group-container"
+            style="row-gap: 0;"
           >
             <div
               class="ant-space-item"
@@ -124,7 +126,8 @@ Array [
             路径
           </div>
           <div
-            class="ant-space ant-space-horizontal ant-space-align-center ant-pro-form-group-container"
+            class="ant-space ant-space-horizontal ant-space-align-start ant-pro-form-group-container"
+            style="row-gap: 0;"
           >
             <div
               class="ant-space-item"
@@ -293,6 +296,7 @@ Array [
           class="ant-pro-table-search ant-pro-table-search-query-filter"
         >
           <form
+            autocomplete="off"
             class="ant-form ant-form-horizontal ant-pro-form-query-filter"
           >
             <input
@@ -666,7 +670,6 @@ Array [
           <div
             class="ant-select ant-pro-filed-search-select ant-select-single ant-select-allow-clear ant-select-show-search"
             style="width: 200px;"
-            text="text"
           >
             <div
               class="ant-select-selector"
@@ -727,6 +730,7 @@ Array [
     </div>
   </div>,
   <form
+    autocomplete="off"
     class="ant-form ant-form-vertical"
     trigger="[object Object]"
   >
@@ -743,7 +747,8 @@ Array [
         分组
       </div>
       <div
-        class="ant-space ant-space-horizontal ant-space-align-center ant-pro-form-group-container"
+        class="ant-space ant-space-horizontal ant-space-align-start ant-pro-form-group-container"
+        style="row-gap: 0;"
       >
         <div
           class="ant-space-item"
@@ -774,9 +779,7 @@ Array [
                 >
                   <div
                     class="ant-select ant-pro-filed-search-select pro-field pro-field-m ant-select-single ant-select-allow-clear ant-select-show-arrow"
-                    name="text"
                     style="min-width: 100px;"
-                    text="123456"
                   >
                     <div
                       class="ant-select-selector"

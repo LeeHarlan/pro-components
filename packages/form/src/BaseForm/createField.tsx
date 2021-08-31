@@ -1,28 +1,12 @@
-﻿import React, { useContext } from 'react';
-import type { FormItemProps } from 'antd';
-import { ConfigProvider } from 'antd';
-import type { ProFieldValueType, SearchTransformKeyFn } from '@ant-design/pro-utils';
-import { omitUndefined } from '@ant-design/pro-utils';
-import { pickProFormItemProps } from '@ant-design/pro-utils';
+﻿import React from 'react';
+import { pickProFormItemProps, omitUndefined } from '@ant-design/pro-utils';
 import classnames from 'classnames';
 import { noteOnce } from 'rc-util/lib/warning';
 import FieldContext from '../FieldContext';
-import LightWrapper from './LightWrapper';
-import type { ProFormItemProps } from '../interface';
+import type { ExtendsProps, ProFormFieldItemProps, ProFormItemCreateConfig } from '../interface';
 import ProFormItem from '../components/FormItem';
 
-export type ProFormItemCreateConfig = {
-  /** 自定义类型 */
-  valueType?: ProFieldValueType;
-  /** 自定义 lightMode */
-  customLightMode?: boolean;
-  /** Light mode 自定义的 label 模式 */
-  lightFilterLabelFormatter?: (value: any) => string;
-  /** 默认的props，如果用户设置会被覆盖 */
-  defaultProps?: Record<string, any>;
-  /** @name 不使用默认的宽度 */
-  ignoreWidth?: boolean;
-} & FormItemProps;
+export const TYPE = Symbol('ProFormComponent');
 
 const WIDTH_SIZE_ENUM = {
   // 适用于短数字，短文本或者选项
@@ -42,61 +26,32 @@ const WIDTH_SIZE_ENUM = {
 
 type ProFormComponent<P, Extends> = React.ComponentType<P & Extends>;
 
-// 给控件扩展的通用的属性
-export type ExtendsProps = {
-  secondary?: boolean;
-  allowClear?: boolean;
-  bordered?: boolean;
-  colSize?: number;
-  /**
-   * 需要与 request 配合使用
-   *
-   * @name 网络请求用的输出，会触发reload
-   */
-  params?: any;
-
-  /** @name 需要放在formItem 时使用 */
-  ignoreFormItem?: boolean;
-
-  /**
-   * 实验性质，可能 api 会有改动，谨慎使用
-   *
-   * @name 只读模式
-   */
-  readonly?: boolean;
-
-  /** @name 提交时转化值，一般用于数组类型 */
-  transform?: SearchTransformKeyFn;
-
-  /**
-   * 给 protable 开的口子
-   *
-   * @name 自定义的 formItemProps
-   */
-  formItemProps?: FormItemProps;
-};
-
 /**
  * 这个方法的主要作用的帮助 Field 增加 FormItem 同时也会处理 lightFilter
  *
  * @param Field
  * @param config
  */
-function createField<P extends ProFormItemProps = any>(
+function createField<P extends ProFormFieldItemProps = any>(
   Field: React.ComponentType<P> | React.ForwardRefExoticComponent<P>,
   config?: ProFormItemCreateConfig,
 ): ProFormComponent<P, ExtendsProps> {
+  // 标记是否是 proform 的组件
+  // @ts-ignore
+  // eslint-disable-next-line no-param-reassign
+  Field.displayName = 'ProFormComponent';
+
   const FieldWithContext: React.FC<P> = (props: P & ExtendsProps) => {
-    const size = useContext(ConfigProvider.SizeContext);
     const {
       valueType,
       customLightMode,
       lightFilterLabelFormatter,
       valuePropName = 'value',
-      defaultProps,
       ignoreWidth,
+      defaultProps,
       ...defaultFormItemProps
-    } = config || {};
+    } = { ...props?.filedConfig, ...config } || {};
+
     const {
       label,
       tooltip,
@@ -111,6 +66,7 @@ function createField<P extends ProFormItemProps = any>(
       allowClear,
       colSize,
       formItemProps: propsFormItemProps,
+      filedConfig,
       ...rest
     } = { ...defaultProps, ...props } as P & ExtendsProps;
 
@@ -122,7 +78,6 @@ function createField<P extends ProFormItemProps = any>(
 
     const formNeedProps = {
       value: (rest as any).value,
-      onChange: (rest as any).onChange,
     };
     const realFieldProps = {
       ...(ignoreFormItem ? formNeedProps : {}),
@@ -150,8 +105,15 @@ function createField<P extends ProFormItemProps = any>(
       !rest['defaultValue'],
       '请不要在 Form 中使用 defaultXXX。如果需要默认值请使用 initialValues 和 initialValue。',
     );
-
     const ignoreWidthValueType = ['switch', 'radioButton', 'radio', 'rate'];
+
+    const realFieldPropsStyle = {
+      ...realFieldProps?.style,
+    };
+    if (realFieldPropsStyle.width !== undefined && (rest as any).valueType === 'switch') {
+      delete realFieldPropsStyle.width;
+    }
+
     const field = (
       <Field
         // ProXxx 上面的 props 透传给 FieldProps，可能包含 Field 自定义的 props，
@@ -162,20 +124,22 @@ function createField<P extends ProFormItemProps = any>(
           ...realFieldProps,
           style: omitUndefined({
             width: width && !WIDTH_SIZE_ENUM[width] ? width : undefined,
-            ...realFieldProps?.style,
+            ...realFieldPropsStyle,
           }),
-          className: classnames(realFieldProps?.className, {
-            'pro-field': width && WIDTH_SIZE_ENUM[width],
-            [`pro-field-${width}`]:
-              width &&
-              // 有些 valueType 不需要宽度
-              !ignoreWidthValueType.includes((props as any)?.valueType as 'text') &&
-              !ignoreWidth &&
-              WIDTH_SIZE_ENUM[width],
-          }),
+          className:
+            classnames(realFieldProps?.className, {
+              'pro-field': width && WIDTH_SIZE_ENUM[width],
+              [`pro-field-${width}`]:
+                width &&
+                // 有些 valueType 不需要宽度
+                !ignoreWidthValueType.includes((props as any)?.valueType as 'text') &&
+                !ignoreWidth &&
+                WIDTH_SIZE_ENUM[width],
+            }) || undefined,
         })}
         proFieldProps={omitUndefined({
-          mode: readonly ? 'read' : 'edit',
+          // @ts-ignore
+          mode: readonly ? 'read' : rest?.mode,
           params: rest.params,
           proFieldKey: `form-field-${otherProps?.name}`,
           ...proFieldProps,
@@ -189,32 +153,34 @@ function createField<P extends ProFormItemProps = any>(
         label={label && proFieldProps?.light !== true ? label : undefined}
         tooltip={proFieldProps?.light !== true && tooltip}
         valuePropName={valuePropName}
+        key={otherProps.name?.toString()}
         {...otherProps}
         ignoreFormItem={ignoreFormItem}
         transform={transform}
         dataFormat={rest.fieldProps?.format}
         valueType={valueType || (rest as any).valueType}
         messageVariables={{
-          label: label as string,
+          label: (label as string) || '',
           ...otherProps?.messageVariables,
         }}
+        lightProps={omitUndefined({
+          ...realFieldProps,
+          valueType: valueType || (rest as any).valueType,
+          bordered,
+          allowClear: field?.props?.allowClear ?? allowClear,
+          light: proFieldProps?.light,
+          label,
+          customLightMode,
+          labelFormatter: lightFilterLabelFormatter,
+          valuePropName,
+          footerRender: field?.props?.footerRender,
+        })}
       >
-        <LightWrapper
-          {...realFieldProps}
-          allowClear={allowClear}
-          bordered={bordered}
-          size={size}
-          light={proFieldProps?.light}
-          customLightMode={customLightMode}
-          label={label}
-          labelFormatter={lightFilterLabelFormatter}
-          valuePropName={valuePropName}
-        >
-          {field}
-        </LightWrapper>
+        {field}
       </ProFormItem>
     );
   };
+
   return FieldWithContext as ProFormComponent<P, ExtendsProps>;
 }
 

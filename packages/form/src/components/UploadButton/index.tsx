@@ -2,10 +2,10 @@ import React from 'react';
 import type { UploadProps, ButtonProps } from 'antd';
 import { Upload, Button } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-import type { ProFormItemProps } from '../../interface';
+import type { ProFormFieldItemProps } from '../../interface';
 import createField from '../../BaseForm/createField';
 
-export type ProFormDraggerProps = ProFormItemProps<UploadProps> & {
+export type ProFormDraggerProps = ProFormFieldItemProps<UploadProps> & {
   icon?: React.ReactNode;
   title?: React.ReactNode;
   name?: UploadProps['name'];
@@ -17,6 +17,7 @@ export type ProFormDraggerProps = ProFormItemProps<UploadProps> & {
   onChange?: UploadProps['onChange'];
   buttonProps?: ButtonProps;
   disabled?: ButtonProps['disabled'];
+  fileList?: UploadProps['fileList'];
 };
 
 /**
@@ -39,6 +40,7 @@ const ProFormUploadButton: React.ForwardRefRenderFunction<any, ProFormDraggerPro
     onChange,
     disabled,
     proFieldProps,
+    fileList,
   },
   ref,
 ) => {
@@ -46,7 +48,8 @@ const ProFormUploadButton: React.ForwardRefRenderFunction<any, ProFormDraggerPro
   const showUploadButton =
     (max === undefined || !value || value?.length < max) && proFieldProps?.mode !== 'read';
 
-  const isPictureCard = fieldProps?.listType === 'picture-card';
+  const isPictureCard = (listType ?? fieldProps?.listType) === 'picture-card';
+
   return (
     <Upload
       action={action}
@@ -55,12 +58,10 @@ const ProFormUploadButton: React.ForwardRefRenderFunction<any, ProFormDraggerPro
       // 'fileList' 改成和 ant.design 文档中 Update 组件 默认 file字段一样
       name={name || 'file'}
       listType={listType || 'picture'}
-      fileList={value}
+      fileList={fileList ?? value}
       {...fieldProps}
       onChange={(info) => {
-        if (onChange) {
-          onChange(info);
-        }
+        onChange?.(info);
         if (fieldProps?.onChange) {
           fieldProps?.onChange(info);
         }

@@ -2,6 +2,180 @@
 
 All notable changes to this project will be documented in this file. See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.2](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.13.1...@ant-design/pro-list@1.13.2) (2021-08-30)
+
+**Note:** Version bump only for package @ant-design/pro-list
+
+## [1.13.1](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.13.0...@ant-design/pro-list@1.13.1) (2021-08-30)
+
+**Note:** Version bump only for package @ant-design/pro-list
+
+# [1.13.0](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.12.3...@ant-design/pro-list@1.13.0) (2021-08-30)
+
+### Bug Fixes
+
+- ProListMeta 的类型提示补充 ([#3548](https://github.com/ant-design/pro-components/issues/3548)) ([c2b627e](https://github.com/ant-design/pro-components/commit/c2b627efb99e6cca75e9cc30981823e064d4159b))
+
+### Features
+
+- **layout:** support layout error boundaries ([#3551](https://github.com/ant-design/pro-components/issues/3551)) ([5b5f76a](https://github.com/ant-design/pro-components/commit/5b5f76a86df14ce42f12ce0e1e916e4b3b2ea357))
+
+## [1.12.3](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.12.2...@ant-design/pro-list@1.12.3) (2021-08-26)
+
+**Note:** Version bump only for package @ant-design/pro-list
+
+## [1.12.2](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.12.1...@ant-design/pro-list@1.12.2) (2021-08-24)
+
+**Note:** Version bump only for package @ant-design/pro-list
+
+## [1.12.1](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.12.0...@ant-design/pro-list@1.12.1) (2021-08-19)
+
+### Bug Fixes
+
+- **table:** 添加滚动条，防止小屏幕下溢出 ([#3449](https://github.com/ant-design/pro-components/issues/3449)) ([cf23e82](https://github.com/ant-design/pro-components/commit/cf23e82dcd4263dd40a912ed6acebb8f9da3bf5e))
+
+# [1.12.0](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.11.1...@ant-design/pro-list@1.12.0) (2021-08-09)
+
+### Features
+
+- **form:** FormItem support FilterDropdown ([#3381](https://github.com/ant-design/pro-components/issues/3381)) ([f5f7dbb](https://github.com/ant-design/pro-components/commit/f5f7dbb2730496a836d684840462c08715caff62))
+- **list:** 添加列表查询 demo ([#3387](https://github.com/ant-design/pro-components/issues/3387)) ([25be644](https://github.com/ant-design/pro-components/commit/25be644fbceff1583963b5c9381517be6815aa84))
+
+## [1.11.1](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.11.0...@ant-design/pro-list@1.11.1) (2021-08-05)
+
+**Note:** Version bump only for package @ant-design/pro-list
+
+# [1.11.0](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.10.12...@ant-design/pro-list@1.11.0) (2021-08-03)
+
+### Features
+
+- **list:** ProList add base proList ([#3361](https://github.com/ant-design/pro-components/issues/3361)) ([753afd8](https://github.com/ant-design/pro-components/commit/753afd81d0ca554f67bf92ef6dec1fab21efb8dd))
+
+## [1.10.12](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.10.11...@ant-design/pro-list@1.10.12) (2021-07-30)
+
+**Note:** Version bump only for package @ant-design/pro-list
+
+## [1.10.11](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.10.10...@ant-design/pro-list@1.10.11) (2021-07-30)
+
+### Bug Fixes
+
+- **list:** better snapshot update style ([#3338](https://github.com/ant-design/pro-components/issues/3338)) ([b7596b9](https://github.com/ant-design/pro-components/commit/b7596b9fdbd9f3e7a53213b34e3ffb495d4f4026))
+
+## [1.10.10](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.10.9...@ant-design/pro-list@1.10.10) (2021-07-26)
+
+**Note:** Version bump only for package @ant-design/pro-list
+
+## [1.10.9](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.10.8...@ant-design/pro-list@1.10.9) (2021-07-21)
+
+### Bug Fixes
+
+- **list:** add list bgcolor #fff ([f3aa561](https://github.com/ant-design/pro-components/commit/f3aa56172f2c29211e8b59becb5725b4c9040013))
+
+## [1.10.8](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.10.7...@ant-design/pro-list@1.10.8) (2021-07-20)
+
+**Note:** Version bump only for package @ant-design/pro-list
+
+## [1.10.7](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.10.6...@ant-design/pro-list@1.10.7) (2021-07-19)
+
+### Bug Fixes
+
+- **table:** fix onSave will merge origin data error ([#3221](https://github.com/ant-design/pro-components/issues/3221)) ([a16473e](https://github.com/ant-design/pro-components/commit/a16473ec56f1b3d1114c9b73fd18be97605ccfae))
+
+## [1.10.6](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.10.5...@ant-design/pro-list@1.10.6) (2021-07-06)
+
+**Note:** Version bump only for package @ant-design/pro-list
+
+## [1.10.5](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.10.4...@ant-design/pro-list@1.10.5) (2021-07-01)
+
+**Note:** Version bump only for package @ant-design/pro-list
+
+## [1.10.4](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.10.3...@ant-design/pro-list@1.10.4) (2021-07-01)
+
+### Bug Fixes
+
+- **list:** fix list title node is null will render error ([#3138](https://github.com/ant-design/pro-components/issues/3138)) ([cfc9297](https://github.com/ant-design/pro-components/commit/cfc92977ca1a6451a3be2068255e5913c7882234))
+
+## [1.10.3](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.10.2...@ant-design/pro-list@1.10.3) (2021-06-28)
+
+**Note:** Version bump only for package @ant-design/pro-list
+
+## [1.10.2](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.10.1...@ant-design/pro-list@1.10.2) (2021-06-23)
+
+### Bug Fixes
+
+- **prolist:** title&description wordBreak ([#3059](https://github.com/ant-design/pro-components/issues/3059)) ([e84ced5](https://github.com/ant-design/pro-components/commit/e84ced54cf6128c79bf71b67f35d32bbba8cb9a1))
+
+## [1.10.1](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.10.0...@ant-design/pro-list@1.10.1) (2021-06-18)
+
+### Bug Fixes
+
+- **proList:** proList props type ([#3041](https://github.com/ant-design/pro-components/issues/3041)) ([#3044](https://github.com/ant-design/pro-components/issues/3044)) ([142ee4f](https://github.com/ant-design/pro-components/commit/142ee4f49ab25f89c7cef5dac558376f38e79566))
+
+# [1.10.0](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.9.2...@ant-design/pro-list@1.10.0) (2021-06-17)
+
+### Features
+
+- **list:** support itemTitleRender props ([#3032](https://github.com/ant-design/pro-components/issues/3032)) ([c5262f2](https://github.com/ant-design/pro-components/commit/c5262f22c96402fa1c250d971aa09604fc098eed))
+
+## [1.9.2](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.9.1...@ant-design/pro-list@1.9.2) (2021-06-15)
+
+**Note:** Version bump only for package @ant-design/pro-list
+
+## [1.9.1](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.9.0...@ant-design/pro-list@1.9.1) (2021-06-09)
+
+**Note:** Version bump only for package @ant-design/pro-list
+
+# [1.9.0](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.8.2...@ant-design/pro-list@1.9.0) (2021-06-08)
+
+### Features
+
+- **form:** support more tooltip props ([#2932](https://github.com/ant-design/pro-components/issues/2932)) ([bedd7eb](https://github.com/ant-design/pro-components/commit/bedd7ebb0784da8fbb9c4998651f39f5efff5354))
+
+## [1.8.2](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.8.1...@ant-design/pro-list@1.8.2) (2021-05-31)
+
+**Note:** Version bump only for package @ant-design/pro-list
+
+## [1.8.1](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.8.0...@ant-design/pro-list@1.8.1) (2021-05-28)
+
+**Note:** Version bump only for package @ant-design/pro-list
+
+# [1.8.0](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.7.7...@ant-design/pro-list@1.8.0) (2021-05-25)
+
+### Features
+
+- **list:** list support locale ([#2840](https://github.com/ant-design/pro-components/issues/2840)) ([f4abe37](https://github.com/ant-design/pro-components/commit/f4abe372cc91ad2cd7ec330eb7b0436e3f1ef112))
+- **list:** prolist support itemHeaderRender ([#2844](https://github.com/ant-design/pro-components/issues/2844)) ([83c5eda](https://github.com/ant-design/pro-components/commit/83c5eda8922f0a326689dde56548fa0cda7d2af0))
+
+## [1.7.7](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.7.6...@ant-design/pro-list@1.7.7) (2021-05-24)
+
+**Note:** Version bump only for package @ant-design/pro-list
+
+## [1.7.6](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.7.5...@ant-design/pro-list@1.7.6) (2021-05-23)
+
+**Note:** Version bump only for package @ant-design/pro-list
+
+## [1.7.5](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.7.4...@ant-design/pro-list@1.7.5) (2021-05-21)
+
+**Note:** Version bump only for package @ant-design/pro-list
+
+## [1.7.4](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.7.3...@ant-design/pro-list@1.7.4) (2021-05-18)
+
+### Bug Fixes
+
+- **list:** add editable props ([#2758](https://github.com/ant-design/pro-components/issues/2758)) ([5cd8eab](https://github.com/ant-design/pro-components/commit/5cd8eab3859226f38200e7d98e100b1266d203d1))
+
+## [1.7.3](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.7.2...@ant-design/pro-list@1.7.3) (2021-05-11)
+
+**Note:** Version bump only for package @ant-design/pro-list
+
+## [1.7.2](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.7.1...@ant-design/pro-list@1.7.2) (2021-04-29)
+
+**Note:** Version bump only for package @ant-design/pro-list
+
+## [1.7.1](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.7.0...@ant-design/pro-list@1.7.1) (2021-04-29)
+
+**Note:** Version bump only for package @ant-design/pro-list
+
 # [1.7.0](https://github.com/ant-design/pro-components/compare/@ant-design/pro-list@1.6.4...@ant-design/pro-list@1.7.0) (2021-04-22)
 
 ### Features

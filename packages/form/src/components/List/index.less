@@ -15,10 +15,12 @@
   }
 
   &-item {
-    &:first-child {
-      .@{ant-prefix}-form-item {
-        .@{ant-prefix}-form-item-label {
-          display: inline-block;
+    &:first-of-type {
+      div:first-of-type {
+        .@{ant-prefix}-form-item {
+          .@{ant-prefix}-form-item-label {
+            display: inline-block;
+          }
         }
       }
     }
@@ -48,5 +50,9 @@
     &:last-child {
       margin-right: 0;
     }
+  }
+
+  &-creator-button-top {
+    margin-bottom: 24px;
   }
 }

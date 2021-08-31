@@ -6,7 +6,7 @@ import type {
   ProTableEditableFnType,
   UseEditableUtilType,
 } from '@ant-design/pro-utils';
-import { isNil } from '@ant-design/pro-utils';
+import { isNil, isDeepEqualReact } from '@ant-design/pro-utils';
 import type { ProFieldEmptyText } from '@ant-design/pro-field';
 import cellRenderToFromItem from './cellRenderToFromItem';
 import { LabelIconTip } from '@ant-design/pro-utils';
@@ -54,6 +54,16 @@ function isEditableCell<T>(
   return editable?.(text, rowData, index) === false;
 }
 
+const isNeedTranText = (item: ProColumns<any>): boolean => {
+  if (item?.valueType?.toString().startsWith('date')) {
+    return true;
+  }
+  if (item?.valueType === 'select' || item?.valueEnum) {
+    return true;
+  }
+  return false;
+};
+
 /**
  * 生成 Copyable 或 Ellipsis 的 dom
  *
@@ -63,23 +73,32 @@ function isEditableCell<T>(
  */
 export const genCopyable = (dom: React.ReactNode, item: ProColumns<any>, text: string) => {
   if (item.copyable || item.ellipsis) {
+    const copyable =
+      item.copyable && text
+        ? {
+            text,
+            tooltips: ['', ''],
+          }
+        : undefined;
+
+    /** 有些 valueType 需要设置copy的为string */
+    const needTranText = isNeedTranText(item);
+    const ellipsis =
+      item.ellipsis && text
+        ? {
+            tooltip: needTranText ? <div className="pro-table-tooltip-text">{dom}</div> : text,
+          }
+        : false;
     return (
       <Typography.Text
         style={{
-          maxWidth: '100%',
+          width: '100%',
           margin: 0,
           padding: 0,
         }}
         title=""
-        copyable={
-          item.copyable && text
-            ? {
-                text,
-                tooltips: ['', ''],
-              }
-            : undefined
-        }
-        ellipsis={item.ellipsis && text ? { tooltip: text } : false}
+        copyable={copyable}
+        ellipsis={ellipsis}
       >
         {dom}
       </Typography.Text>
@@ -135,7 +154,10 @@ export function columnRender<T>({
     rowData,
     columnProps: {
       ...columnProps,
+      // 为了兼容性，原来写了个错别字
+      // @ts-ignore
       entry: rowData,
+      entity: rowData,
     },
     columnEmptyText,
     type,
@@ -150,7 +172,12 @@ export function columnRender<T>({
   if (mode === 'edit') {
     if (columnProps.valueType === 'option') {
       return (
-        <Form.Item shouldUpdate noStyle>
+        <Form.Item
+          shouldUpdate={(prevValues, nextValues) => {
+            return !isDeepEqualReact(get(prevValues, [recordKey]), get(nextValues, [recordKey]));
+          }}
+          noStyle
+        >
           {(form: any) => (
             <Space size={16}>
               {editableUtils.actionRender(
@@ -196,5 +223,6 @@ export function columnRender<T>({
   }
 
   const isReactRenderNode = React.isValidElement(dom) || ['string', 'number'].includes(typeof dom);
+
   return !isNil(dom) && isReactRenderNode ? dom : null;
 }

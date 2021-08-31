@@ -4,20 +4,14 @@
 @pro-list-prefix-cls: ~'@{ant-prefix}-pro-list';
 
 .@{pro-list-prefix-cls} {
-  .@{ant-prefix}-list-grid {
-    padding: 0 24px;
-  }
+  background-color: transparent;
 
   .@{ant-prefix}-pro-table-alert {
-    margin: 0 24px 16px 24px;
-  }
-
-  .@{ant-prefix}-list-pagination {
-    padding: 0 18px;
+    margin-bottom: 16px;
   }
 
   .@{pro-list-prefix-cls}-row {
-    padding: 0 18px 0 24px;
+    border-bottom: 1px solid @border-color-split;
 
     &:last-child {
       border-bottom: none;
@@ -171,6 +165,7 @@
 
     &-title {
       margin-right: 16px;
+      word-break: break-all;
       cursor: pointer;
       &:hover {
         color: @primary-color;
@@ -191,6 +186,7 @@
 
     &-description {
       margin-top: 4px;
+      word-break: break-all;
     }
 
     &-avatar {
@@ -210,7 +206,7 @@
 
     .@{ant-prefix}-list-item {
       width: 100%;
-      border-bottom: 1px solid @border-color-split;
+      padding: 12px 18px 12px 24px;
 
       &-meta-avatar {
         display: flex;
@@ -227,6 +223,9 @@
   }
 
   &-no-split {
+    .@{pro-list-prefix-cls}-row {
+      border-bottom: none;
+    }
     .@{ant-prefix}-list .@{ant-prefix}-list-item {
       border-bottom: none;
     }
@@ -241,6 +240,7 @@
   .@{ant-prefix}-list-vertical {
     .@{pro-list-prefix-cls}-row {
       padding: 0 24px;
+
       &-header-title {
         display: flex;
         flex-direction: column;

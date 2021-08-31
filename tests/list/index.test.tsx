@@ -1,7 +1,7 @@
 import { mount } from 'enzyme';
 import type { ReactText } from 'react';
 import React, { useState } from 'react';
-import ProList from '@ant-design/pro-list';
+import ProList, { BaseProList } from '@ant-design/pro-list';
 import { act } from 'react-dom/test-utils';
 import PaginationDemo from '../../packages/list/src/demos/pagination';
 import { waitForComponentToPaint } from '../util';
@@ -38,6 +38,32 @@ describe('List', () => {
     );
     expect(html.find('.ant-pro-list-row-title').text()).toEqual('我是名称');
     expect(html.find('.ant-pro-list-row-description').text()).toEqual('desc text');
+  });
+
+  it('🚏 BaseList', async () => {
+    const html = mount(
+      <BaseProList
+        dataSource={[
+          {
+            name: '我是名称',
+            desc: {
+              text: 'desc text',
+            },
+          },
+        ]}
+        metas={{
+          title: {
+            dataIndex: 'name',
+          },
+          description: {
+            dataIndex: ['desc', 'text'],
+          },
+        }}
+      />,
+    );
+    expect(html.find('.ant-pro-list-row-title').text()).toEqual('我是名称');
+    expect(html.find('.ant-pro-list-row-description').text()).toEqual('desc text');
+    expect(html.find('.ant-card').exists()).toBeFalsy();
   });
 
   it('🚏 only has content', async () => {
@@ -485,5 +511,61 @@ describe('List', () => {
 
     expect(onClick).toBeCalled();
     expect(onMouseEnter).toBeCalledWith('我是名称');
+  });
+
+  it('🚏 ProList support itemHeaderRender', async () => {
+    const html = mount(
+      <ProList<DataSourceType>
+        dataSource={[
+          {
+            name: '我是名称',
+            desc: {
+              text: 'desc text',
+            },
+          },
+        ]}
+        itemHeaderRender={(item) => <>qixian:{item.name}</>}
+        metas={{
+          title: {
+            dataIndex: 'name',
+          },
+          description: {
+            dataIndex: ['desc', 'text'],
+          },
+        }}
+      />,
+    );
+
+    waitForComponentToPaint(html);
+
+    expect(html.find('.ant-pro-list-row-header').at(0).text()).toBe('qixian:我是名称');
+  });
+
+  it('🚏 ProList support itemTitleRender', async () => {
+    const html = mount(
+      <ProList<DataSourceType>
+        dataSource={[
+          {
+            name: '我是名称',
+            desc: {
+              text: 'desc text',
+            },
+          },
+        ]}
+        itemTitleRender={(item) => <>qixian:{item.name}</>}
+        metas={{
+          title: {
+            dataIndex: 'name',
+          },
+          description: {
+            dataIndex: ['desc', 'text'],
+          },
+        }}
+      />,
+    );
+
+    waitForComponentToPaint(html);
+
+    expect(html.find('.ant-pro-list-row-header').at(0).text()).toBe('qixian:我是名称desc text');
   });
 });

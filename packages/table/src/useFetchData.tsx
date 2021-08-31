@@ -66,7 +66,7 @@ const useFetchData = <T extends RequestData<any>>(
   const setDataAndLoading = (newData: T[], dataTotal: number) => {
     unstable_batchedUpdates(() => {
       setList(newData);
-      if (pageInfo.total !== dataTotal) {
+      if (pageInfo?.total !== dataTotal) {
         setPageInfo({
           ...pageInfo,
           total: dataTotal || newData.length,
@@ -101,7 +101,7 @@ const useFetchData = <T extends RequestData<any>>(
     }
 
     requesting.current = true;
-    const { pageSize, current } = pageInfo;
+    const { pageSize, current } = pageInfo || {};
     try {
       const pageParams =
         options?.pageInfo !== false
@@ -112,7 +112,6 @@ const useFetchData = <T extends RequestData<any>>(
           : undefined;
 
       const { data = [], success, total = 0, ...rest } = (await getData(pageParams)) || {};
-
       requesting.current = false;
 
       // 如果失败了，直接返回，不走剩下的逻辑了
@@ -191,12 +190,17 @@ const useFetchData = <T extends RequestData<any>>(
 
   /** PageIndex 改变的时候自动刷新 */
   useEffect(() => {
-    const { current, pageSize } = pageInfo;
+    const { current, pageSize } = pageInfo || {};
     // 如果上次的页码为空或者两次页码等于是没必要查询的
     // 如果 pageSize 发生变化是需要查询的，所以又加了 prePageSize
     if ((!prePage || prePage === current) && (!prePageSize || prePageSize === pageSize)) {
       return;
     }
+
+    if ((options.pageInfo && list && list?.length > pageSize) || 0) {
+      return;
+    }
+
     // 如果 list 的长度大于 pageSize 的长度
     // 说明是一个假分页
     // (pageIndex - 1 || 1) 至少要第一页
@@ -215,7 +219,7 @@ const useFetchData = <T extends RequestData<any>>(
     }
     fetchListDebounce.run(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageInfo.pageSize]);
+  }, [pageInfo?.pageSize]);
 
   useDeepCompareEffect(() => {
     fetchListDebounce.run(false);
