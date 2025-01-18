@@ -1,5 +1,13 @@
 export default {
   moneySymbol: 'RM',
+  form: {
+    lightFilter: {
+      more: 'Lebih banyak',
+      clear: 'Jelas',
+      confirm: 'Mengesahkan',
+      itemUnit: 'Item',
+    },
+  },
   tableForm: {
     search: 'Cari',
     reset: 'Menetapkan semula',
@@ -39,5 +47,25 @@ export default {
     densityLarger: 'Besar',
     densityMiddle: 'Tengah',
     densitySmall: 'Kecil',
+  },
+  stepsForm: {
+    next: 'Seterusnya',
+    prev: 'Sebelumnya',
+    submit: 'Selesai',
+  },
+  loginForm: {
+    submitText: 'Log Masuk',
+  },
+  editableTable: {
+    action: {
+      save: 'Simpan',
+      cancel: 'Membatalkan',
+      delete: 'Menghapuskan',
+      add: 'tambah baris data',
+    },
+  },
+  switch: {
+    open: 'Terbuka',
+    close: 'Tutup',
   },
 };

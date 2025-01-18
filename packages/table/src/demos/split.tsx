@@ -1,11 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import type { ProColumns } from '@ant-design/pro-components';
+import { ProCard, ProTable } from '@ant-design/pro-components';
 import type { BadgeProps } from 'antd';
-import { Button, Badge } from 'antd';
-import type { ProColumns } from '@ant-design/pro-table';
-import ProTable from '@ant-design/pro-table';
-import ProCard from '@ant-design/pro-card';
-// @ts-ignore
-import styles from './split.less';
+import { Badge, Button } from 'antd';
+import React, { useEffect, useState } from 'react';
 
 type TableListItem = {
   createdAtRange?: number[];
@@ -19,7 +16,9 @@ type DetailListProps = {
 
 const DetailList: React.FC<DetailListProps> = (props) => {
   const { ip } = props;
-  const [tableListDataSource, setTableListDataSource] = useState<TableListItem[]>([]);
+  const [tableListDataSource, setTableListDataSource] = useState<
+    TableListItem[]
+  >([]);
 
   const columns: ProColumns<TableListItem>[] = [
     {
@@ -94,7 +93,7 @@ for (let i = 0; i < 10; i += 1) {
     ip: `106.14.98.1${i}4`,
     cpu: 10,
     mem: 20,
-    status: valueEnum[Math.floor(Math.random() * 10) % 4],
+    status: valueEnum[((Math.floor(Math.random() * 10) % 4) + '') as '0'],
     disk: 30,
   });
 }
@@ -105,7 +104,7 @@ type IPListProps = {
 };
 
 const IPList: React.FC<IPListProps> = (props) => {
-  const { onChange, ip } = props;
+  const { onChange } = props;
 
   const columns: ProColumns<IpListItem>[] = [
     {
@@ -156,9 +155,6 @@ const IPList: React.FC<IPListProps> = (props) => {
         });
       }}
       rowKey="ip"
-      rowClassName={(record) => {
-        return record.ip === ip ? styles['split-row-select-active'] : '';
-      }}
       toolbar={{
         search: {
           onSearch: (value) => {

@@ -1,9 +1,10 @@
-import React from 'react';
-import { Dropdown, Menu, Space, Tabs } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
+import { ProProvider } from '@ant-design/pro-provider';
+import { compareVersions, menuOverlayCompatible } from '@ant-design/pro-utils';
+import { Dropdown, Space, Tabs, version } from 'antd';
 import classNames from 'classnames';
 import useMergedState from 'rc-util/lib/hooks/useMergedState';
-import './index.less';
+import React, { useContext } from 'react';
 
 export type ListToolBarMenuItem = {
   key: React.Key;
@@ -14,18 +15,29 @@ export type ListToolBarMenuItem = {
 export type ListToolBarHeaderMenuProps = {
   type?: 'inline' | 'dropdown' | 'tab';
   activeKey?: React.Key;
+  defaultActiveKey?: React.Key;
   items?: ListToolBarMenuItem[];
   onChange?: (activeKey?: React.Key) => void;
   prefixCls?: string;
 };
 
 const HeaderMenu: React.FC<ListToolBarHeaderMenuProps> = (props) => {
-  const { items = [], type = 'inline', prefixCls, activeKey: propActiveKey } = props;
+  const { hashId } = useContext(ProProvider);
+  const {
+    items = [],
+    type = 'inline',
+    prefixCls,
+    activeKey: propActiveKey,
+    defaultActiveKey,
+  } = props;
 
-  const [activeKey, setActiveKey] = useMergedState<React.Key>(propActiveKey as React.Key, {
-    value: propActiveKey,
-    onChange: props.onChange,
-  });
+  const [activeKey, setActiveKey] = useMergedState<React.Key>(
+    propActiveKey || (defaultActiveKey as React.Key),
+    {
+      value: propActiveKey,
+      onChange: props.onChange,
+    },
+  );
 
   if (items.length < 1) {
     return null;
@@ -38,16 +50,25 @@ const HeaderMenu: React.FC<ListToolBarHeaderMenuProps> = (props) => {
 
   if (type === 'inline') {
     return (
-      <div className={classNames(`${prefixCls}-menu`, `${prefixCls}-inline-menu`)}>
-        {items.map((item) => (
+      <div
+        className={classNames(
+          `${prefixCls}-menu`,
+          `${prefixCls}-inline-menu`,
+          hashId,
+        )}
+      >
+        {items.map((item, index) => (
           <div
-            key={item.key}
+            key={item.key || index}
             onClick={() => {
               setActiveKey(item.key);
             }}
             className={classNames(
               `${prefixCls}-inline-menu-item`,
-              activeItem.key === item.key ? `${prefixCls}-inline-menu-item-active` : undefined,
+              activeItem.key === item.key
+                ? `${prefixCls}-inline-menu-item-active`
+                : undefined,
+              hashId,
             )}
           >
             {item.label}
@@ -59,33 +80,46 @@ const HeaderMenu: React.FC<ListToolBarHeaderMenuProps> = (props) => {
 
   if (type === 'tab') {
     return (
-      <Tabs activeKey={activeItem.key as string} onTabClick={(key) => setActiveKey(key)}>
-        {items.map(({ label, key, ...rest }) => {
-          return <Tabs.TabPane tab={label} key={key} {...rest} />;
-        })}
+      <Tabs
+        items={items.map((item) => ({
+          ...item,
+          key: item.key?.toString(),
+        }))}
+        activeKey={activeItem.key as string}
+        onTabClick={(key) => setActiveKey(key)}
+      >
+        {compareVersions(version, '4.23.0') < 0
+          ? items?.map((item, index) => {
+              /* 如果版本低于 4.23.0，不支持 items */
+              return (
+                <Tabs.TabPane
+                  {...item}
+                  key={item.key || index}
+                  tab={item.label}
+                />
+              );
+            })
+          : null}
       </Tabs>
     );
   }
+  const dropdownProps = menuOverlayCompatible({
+    selectedKeys: [activeItem.key as string],
+    onClick: (item) => {
+      setActiveKey(item.key);
+    },
+    items: items.map((item, index) => ({
+      key: item.key || index,
+      disabled: item.disabled,
+      label: item.label,
+    })),
+  });
 
   return (
-    <div className={classNames(`${prefixCls}-menu`, `${prefixCls}-dropdownmenu`)}>
-      <Dropdown
-        trigger={['click']}
-        overlay={
-          <Menu
-            selectedKeys={[activeItem.key as string]}
-            onClick={(item) => {
-              setActiveKey(item.key);
-            }}
-          >
-            {items.map((item) => (
-              <Menu.Item key={item.key} disabled={item.disabled}>
-                {item.label}
-              </Menu.Item>
-            ))}
-          </Menu>
-        }
-      >
+    <div
+      className={classNames(`${prefixCls}-menu`, `${prefixCls}-dropdownmenu`)}
+    >
+      <Dropdown trigger={['click']} {...dropdownProps}>
         <Space className={`${prefixCls}-dropdownmenu-label`}>
           {activeItem.label}
           <DownOutlined />

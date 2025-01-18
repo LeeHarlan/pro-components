@@ -1,8 +1,14 @@
-import { render } from 'enzyme';
-import React from 'react';
 import Field from '@ant-design/pro-field';
+import { cleanup, render } from '@testing-library/react';
+
+afterEach(() => {
+  cleanup();
+});
 
 describe('Field Status', () => {
+  afterEach(() => {
+    cleanup();
+  });
   const statusList = [
     'Success',
     'Error',
@@ -17,7 +23,7 @@ describe('Field Status', () => {
   ];
   statusList.forEach((status) => {
     it(`🥩 ${status} render`, async () => {
-      const html = render(
+      const { container } = render(
         <Field
           text="open"
           valueEnum={{
@@ -29,12 +35,12 @@ describe('Field Status', () => {
           mode="read"
         />,
       );
-      expect(html).toMatchSnapshot();
+      expect(container).toMatchSnapshot();
     });
   });
 
   it(`🥩 red color render`, async () => {
-    const html = render(
+    const { container } = render(
       <Field
         text="open"
         valueEnum={{
@@ -46,6 +52,6 @@ describe('Field Status', () => {
         mode="read"
       />,
     );
-    expect(html).toMatchSnapshot();
+    expect(container).toMatchSnapshot();
   });
 });

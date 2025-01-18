@@ -26,7 +26,7 @@ export default {
     total: {
       range: ' ',
       total: 'de',
-      item: 'items',
+      item: 'itens',
     },
   },
   tableToolBar: {
@@ -53,11 +53,19 @@ export default {
     prev: 'Anterior',
     submit: 'Enviar',
   },
+  loginForm: {
+    submitText: 'Entrar',
+  },
   editableTable: {
     action: {
       save: 'Salvar',
       cancel: 'Cancelar',
       delete: 'Apagar',
+      add: 'adicionar uma linha de dados',
     },
+  },
+  switch: {
+    open: 'abrir',
+    close: 'fechar',
   },
 };

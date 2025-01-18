@@ -53,4 +53,19 @@ export default {
     prev: 'Zurück',
     submit: 'Abschließen',
   },
+  loginForm: {
+    submitText: 'Zaloguj się',
+  },
+  editableTable: {
+    action: {
+      save: 'Zapisać',
+      cancel: 'Anuluj',
+      delete: 'Usunąć',
+      add: 'dodawanie wiersza danych',
+    },
+  },
+  switch: {
+    open: 'otwierać',
+    close: 'zamykać',
+  },
 };

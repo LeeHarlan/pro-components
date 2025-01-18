@@ -1,7 +1,7 @@
-import React, { useRef, useState } from 'react';
-import { Button, message, Space } from 'antd';
-import type { FormInstance } from 'antd';
-import { ModalForm, ProFormText } from '@ant-design/pro-form';
+import type { ProFormInstance } from '@ant-design/pro-components';
+import { ModalForm, ProFormText } from '@ant-design/pro-components';
+import { Button, Space, message } from 'antd';
+import { useRef, useState } from 'react';
 
 const waitTime = (time: number = 100) => {
   return new Promise((resolve) => {
@@ -12,15 +12,16 @@ const waitTime = (time: number = 100) => {
 };
 
 export default () => {
-  const formRef = useRef<FormInstance>();
+  const restFormRef = useRef<ProFormInstance>();
+  const formRef = useRef<ProFormInstance>();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   return (
     <Space>
       <ModalForm
         title="新建表单"
-        formRef={formRef}
-        visible={modalVisible}
+        formRef={restFormRef}
+        open={modalVisible}
         trigger={
           <Button
             type="primary"
@@ -31,14 +32,14 @@ export default () => {
             通过 formRef 重置
           </Button>
         }
-        onVisibleChange={setModalVisible}
+        onOpenChange={setModalVisible}
         submitter={{
           searchConfig: {
             resetText: '重置',
           },
           resetButtonProps: {
             onClick: () => {
-              formRef.current?.resetFields();
+              restFormRef.current?.resetFields();
               //   setModalVisible(false);
             },
           },
@@ -58,7 +59,12 @@ export default () => {
           placeholder="请输入名称"
         />
 
-        <ProFormText width="md" name="company" label="我方公司名称" placeholder="请输入名称" />
+        <ProFormText
+          width="md"
+          name="company"
+          label="我方公司名称"
+          placeholder="请输入名称"
+        />
       </ModalForm>
       <ModalForm
         title="新建表单"
@@ -94,7 +100,12 @@ export default () => {
           placeholder="请输入名称"
         />
 
-        <ProFormText width="md" name="company" label="我方公司名称" placeholder="请输入名称" />
+        <ProFormText
+          width="md"
+          name="company"
+          label="我方公司名称"
+          placeholder="请输入名称"
+        />
       </ModalForm>
     </Space>
   );

@@ -1,17 +1,17 @@
-import React from 'react';
-import { RightOutlined, EllipsisOutlined } from '@ant-design/icons';
-import { StatisticCard } from '@ant-design/pro-card';
-import { Space } from 'antd';
+import { EllipsisOutlined, RightOutlined } from '@ant-design/icons';
+import { StatisticCard } from '@ant-design/pro-components';
+import { Space, theme } from 'antd';
 
 const { Statistic } = StatisticCard;
 
 export default () => {
+  const { token } = theme.useToken();
   return (
     <StatisticCard
       title={
         <Space>
           <span>部门一</span>
-          <RightOutlined style={{ color: 'rgba(0,0,0,0.65)' }} />
+          <RightOutlined style={{ color: token.colorTextHeading }} />
         </Space>
       }
       extra={<EllipsisOutlined />}

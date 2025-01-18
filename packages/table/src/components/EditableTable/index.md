@@ -1,10 +1,6 @@
 ---
 title: EditableProTable - 可编辑表格
-group:
-  path: /
-nav:
-  title: 组件
-  path: /components
+atomId: EditableProTable
 ---
 
 # EditableProTable - 可编辑表格
@@ -15,54 +11,145 @@ nav:
 
 ### 可编辑表格
 
-<code src="./demos/basic.tsx" background="#f5f5f5" height="420px" title="可编辑表格" />
+<code src="./demos/basic.tsx"  background="var(--main-bg-color)"></code>
+
+### 单元格编辑
+
+<code src="./demos/cell-editor-table.tsx"  background="var(--main-bg-color)" ></code>
+
+### 行编辑
+
+<code src="./demos/row-editor-table.tsx"  background="var(--main-bg-color)" ></code>
+
+### 与 FormItem 配合
+
+<code src="./demos/form-item.tsx"  background="var(--main-bg-color)" ></code>
+
+### 与编辑表格外的内容联动
+
+<code src="./demos/form-linkage.tsx"  background="var(--main-bg-color)" ></code>
+
+### 有子列的表格增加
+
+<code src="./demos/children.tsx"  background="var(--main-bg-color)" ></code>
 
 ### 自定义可编辑表格
 
-<code src="./demos/custom.tsx" background="#f5f5f5" height="420px" title="自定义可编辑表格" />
+<code src="./demos/custom.tsx"  background="var(--main-bg-color)" ></code>
 
 ### 实时保存的编辑表格
 
-<code src="./demos/real-time-editing.tsx" background="#f5f5f5" height="420px" title="实时保存的编辑表格" />
+<code src="./demos/real-time-editing.tsx"  background="var(--main-bg-color)" ></code>
 
-## API
+### 复杂的编辑表格
+
+<code src="./demos/fuza.tsx"  background="var(--main-bg-color)" ></code>
+
+## EditableProTable
 
 | 属性 | 描述 | 类型 | 默认值 |
 | --- | --- | --- | --- |
-| value | 同 dataSource，传入一个数组,是 table 渲染的元数据 | `T[]` | `undefined` |
-| onChange | dataSource 修改时触发，删除和修改都会触发,如果设置了 value，Table 会成为一个受控组件。 | `(value:T[])=>void` | `undefined` |
-| recordCreatorProps | 新建一行数据的相关配置 | [RecordCreatorProps](#recordcreator) & [ButtonProps](https://ant.design/components/button-cn/#API) | - |
-| maxLength | 最大的行数，到达最大行数新建按钮会自动消失 | number | - |
-| editable | 在编辑表格中是否可编辑的，函数的参数和 table 的 render 一样 | `false` \| `(text: any, record: T,index: number) => boolean` | true |
+| `value` | 同 dataSource，传入一个数组，是 table 渲染的元数据 | `T[]` | `undefined` |
+| `onChange` | dataSource 修改时触发，删除和修改都会触发，如果设置了 value，Table 会成为一个受控组件。 | `(value:T[])=>void` | `undefined` |
+| `recordCreatorProps` | 新建一行数据的相关配置 | [RecordCreatorProps](#recordcreator) & [ButtonProps](https://ant.design/components/button-cn/#API) | - |
+| `maxLength` | 最大的行数，到达最大行数新建按钮会自动消失 | number | - |
+| `editable` | 可编辑表格的相关配置 | [TableRowEditable](#editable-编辑行配置) | - |
+| `controlled` | 是否受控，如果受控每次编辑都会触发 onChange，并且会修改 dataSource | `boolean` | false |
+| `editableFormRef` | table 所有的 form，带了一些表格特有的操作 | `React.Ref<EditableFormInstance<T>>` | `undefined` |
 
 > 别的 API 与 ProTable 相同。
 
-### editable 编辑行配置
+### Editable 新建行
+
+新增一行的时候要保证 `recordCreatorProps.record` key 唯一，不然会导致编辑出错。
+
+```tsx | pure
+<EditableTable
+  rowKey="id"
+  recordCreatorProps={{
+    position: position as 'top',
+    // 每次新增的时候需要Key
+    record: () => ({ id: getNewId() }),
+  }}
+/>
+```
+
+### EditableFormInstance 表格列表单操作
+
+相比于 ProForm 的表单，可编辑表格增加了以下的三个方法。
+
+```tsx | pure
+  /**
+   * 获取一行数据的
+   * @param rowIndex
+   * @returns T | undefined
+   *
+   * @example getRowData(1)  可以传入第几行的数据
+   * @example getRowData("id")  也可以传入 rowKey，根据你列的唯一key 来获得。
+   */
+  getRowData?: (rowIndex: string | number) => T | undefined;
+  /**
+   * 获取整个 table 的数据
+   * @returns T[] | undefined
+   */
+  getRowsData?: () => T[] | undefined;
+  /**
+   * 设置一行的数据，会将数据进行简单的 merge
+   *
+   * {title:"old", decs:"old",id:"old"} -> set {title:"new"} -> {title:"new", decs:"old",id:"old"}
+   *
+   * @description 只会做最第一层对象的 merge 哦。
+   * {title:"old", decs:{name:"old",key:"old"},id:"old"} -> set {decs:{name:"new"}} -> {title:"old", decs:{name:"new"},id:"old"} -> set {decs:{name:"old"}}
+   *
+   * @param rowIndex
+   * @param data
+   * @returns void
+   *
+   * 根据行号设置
+   * @example setRowData(1, { title:"new" })  可以传入修改第几行
+   *
+   * 根据行 id 设置
+   * @example setRowData("id", { title:"new" })  也可以传入 rowKey，根据你列的唯一 key 来设置。
+   *
+   * 清空原有数据
+   * @example setRowData(1, { title:undefined })
+   *
+   */
+  setRowData?: (rowIndex: string | number, data: Partial<T>) => void;
+```
+
+### TableRowEditable
 
 | 属性 | 描述 | 类型 | 默认值 |
 | --- | --- | --- | --- |
 | type | 可编辑表格的类型，单行编辑或者多行编辑 | `single` \| `multiple` | - |
 | form | 可编辑表格的 form 实例，使用 `Form.useForm` 生成后使用 | `FormInstance` | - |
+| formProps | 可以配置 form 的属性，但是不支持 onFinish | [`FormProps`](https://procomponents.ant.design/components/form#proform) | - |
 | editableKeys | 正在编辑的行，受控属性。 默认 `key` 会使用 `rowKey` 的配置，如果没有配置会使用 `index`，建议使用 rowKey | `Key[]` | - |
 | onChange | 行数据被修改的时候触发 | `(editableKeys: Key[], editableRows: T[]) => void` | - |
-| onSave | 保存一行的时候触发，只更新 | `(key: Key, row: T,newLine?:newLineConfig) => Promise<any>` | - |
+| onSave | 保存一行的时候触发 | `(key: Key, row: T,originRow:T,newLine?:newLineConfig) => Promise<any>` | - |
+| saveText | 保存一行的文字 | `React.ReactNode` | `保存` |
 | onDelete | 删除一行的时候触发 | `(key: Key, row: T) => Promise<any>` | - |
-| onCancel | 取消编辑一行时触发 | `(key: Key, row: T,newLine?:newLineConfig) => Promise<any>` | - |
+| deleteText | 删除一行的文字 | `React.ReactNode` | `删除` |
+| onCancel | 取消编辑一行时触发 | `(key: Key, row: T,originRow:T,newLine?:newLineConfig) => Promise<any>` | - |
+| cancelText | 取消编辑一行的文字 | `React.ReactNode` | `取消` |
 | actionRender | 自定义编辑模式的操作栏 | `(row: T, config: ActionRenderConfig<T>) => ReactNode[]` | - |
-| deletePopconfirmMessage | 删除时弹出的确认框提示消息 | `ReactNode` | `删除此行？` |
+| deletePopconfirmMessage | 删除时弹出的确认框提示消息 | `ReactNode` | `删除此项？` |
 | onlyOneLineEditorAlertMessage | 只能编辑一行的的提示 | `ReactNode` | `只能同时编辑一行` |
 | onlyAddOneLineAlertMessage | 只能同时新增一行的提示 | `ReactNode` | `只能新增一行` |
 
-### recordCreatorProps 新建按钮配置
+### RecordCreatorProps
 
-为了使用，我们预设了一个新建的功能，大多数情况下已经可以满足大部分新建的需求，但是很多时候需求总是千奇百怪。我们也准备了 `recordCreatorProps` 来控制生成按钮。与 Pro 系列组件的 API 相同，`recordCreatorProps={false}`就可以关掉按钮，同时使用 `actionRef.current?.addEditRecord(row)`  来控制新建行。
+为了使用，我们预设了一个新建的功能，大多数情况下已经可以满足大部分新建的需求，但是很多时候需求总是千奇百怪。我们也准备了 `recordCreatorProps` 来控制生成按钮。与 Pro 系列组件的 API 相同，`recordCreatorProps={false}`就可以关掉按钮，同时使用 `actionRef.current?.addEditRecord(row)` 来控制新建行。
 
-`recordCreatorProps` 也支持自定义一些样式，`position='top'|'end'` 可以配置增加在表格头还是表格尾部。`record` 可以配置新增行的默认数据。以下是一个列举
+`recordCreatorProps` 也支持自定义一些样式，`position='top'|'bottom'` 可以配置增加在表格头还是表格尾部。`record` 可以配置新增行的默认数据。以下是一个列举
 
 ```typescript
 recordCreatorProps = {
+  // 要增加到哪个节点下，一般用于多重嵌套表格
+  parentKey: React.key,
   // 顶部添加还是末尾添加
-  position: 'end',
+  position: 'bottom',
   // 新增一行的方式，默认是缓存，取消后就会消失
   // 如果设置为 dataSource 会触发 onchange，取消后也不会消失，只能删除
   newRecordType: 'dataSource',
@@ -126,8 +213,14 @@ const TagList: React.FC<{
 
   const handleInputConfirm = () => {
     let tempsTags = [...(value || [])];
-    if (inputValue && tempsTags.filter((tag) => tag.label === inputValue).length === 0) {
-      tempsTags = [...tempsTags, { key: `new-${tempsTags.length}`, label: inputValue }];
+    if (
+      inputValue &&
+      tempsTags.filter((tag) => tag.label === inputValue).length === 0
+    ) {
+      tempsTags = [
+        ...tempsTags,
+        { key: `new-${tempsTags.length}`, label: inputValue },
+      ];
     }
     onChange?.(tempsTags);
     setNewTags([]);
@@ -196,7 +289,7 @@ render: (text, record, _, action) => [
       id: (Math.random() * 1000000).toFixed(0),
     }}
   >
-    <a>复制此行到末尾</a>
+    <a>复制此项到末尾</a>
   </EditableProTable.RecordCreator>,
 ];
 ```
@@ -206,6 +299,9 @@ render: (text, record, _, action) => [
 ```typescript
 const editable = {
   // defaultDom = {save,cancel,delete} 可以酌情添加和使用
-  actionRender: (row, config, defaultDom) => [defaultDom.save, defaultDom.cancel],
+  actionRender: (row, config, defaultDom) => [
+    defaultDom.save,
+    defaultDom.cancel,
+  ],
 };
 ```

@@ -1,8 +1,8 @@
+import { proTheme, useIntl } from '@ant-design/pro-provider';
+import type { ButtonProps } from 'antd';
+import { Button, Form } from 'antd';
+import omit from 'rc-util/lib/omit';
 import React from 'react';
-import type { FormInstance, ButtonProps } from 'antd';
-import { Button, Space } from 'antd';
-import omit from 'omit.js';
-import { useIntl } from '@ant-design/pro-provider';
 
 /** @name 用于配置操作栏 */
 export type SearchConfig = {
@@ -12,7 +12,7 @@ export type SearchConfig = {
   submitText?: React.ReactNode;
 };
 
-export type SubmitterProps<T = {}> = {
+export type SubmitterProps<T = Record<string, any>> = {
   /** @name 提交方法 */
   onSubmit?: (value?: T) => void;
   /** @name 重置方法 */
@@ -42,21 +42,24 @@ export type SubmitterProps<T = {}> = {
  * @param props
  */
 
-const Submitter: React.FC<SubmitterProps & { form: FormInstance }> = (props) => {
+const Submitter: React.FC<SubmitterProps> = (props) => {
   const intl = useIntl();
+  const form = Form.useFormInstance();
   if (props.render === false) {
     return null;
   }
 
   const {
-    form,
     onSubmit,
     render,
     onReset,
     searchConfig = {},
     submitButtonProps,
-    resetButtonProps = {},
+    resetButtonProps,
   } = props;
+
+  const { token } = proTheme.useToken();
+
   const submit = () => {
     form.submit();
     onSubmit?.();
@@ -64,9 +67,7 @@ const Submitter: React.FC<SubmitterProps & { form: FormInstance }> = (props) => 
 
   const reset = () => {
     form.resetFields();
-    requestAnimationFrame(() => {
-      onReset?.();
-    });
+    onReset?.();
   };
 
   const {
@@ -79,17 +80,20 @@ const Submitter: React.FC<SubmitterProps & { form: FormInstance }> = (props) => 
   if (resetButtonProps !== false) {
     dom.push(
       <Button
-        {...omit(resetButtonProps, ['preventDefault'])}
+        {...omit(resetButtonProps ?? {}, ['preventDefault'] as any)}
         key="rest"
         onClick={(e) => {
           if (!resetButtonProps?.preventDefault) reset();
-          resetButtonProps?.onClick?.(e);
+          resetButtonProps?.onClick?.(
+            e as React.MouseEvent<HTMLButtonElement, MouseEvent>,
+          );
         }}
       >
         {resetText}
       </Button>,
     );
   }
+
   if (submitButtonProps !== false) {
     dom.push(
       <Button
@@ -98,7 +102,9 @@ const Submitter: React.FC<SubmitterProps & { form: FormInstance }> = (props) => 
         key="submit"
         onClick={(e) => {
           if (!submitButtonProps?.preventDefault) submit();
-          submitButtonProps?.onClick?.(e);
+          submitButtonProps?.onClick?.(
+            e as React.MouseEvent<HTMLButtonElement, MouseEvent>,
+          );
         }}
       >
         {submitText}
@@ -106,10 +112,13 @@ const Submitter: React.FC<SubmitterProps & { form: FormInstance }> = (props) => 
     );
   }
 
-  const renderDom = render ? render({ ...props, submit, reset }, dom) : dom;
+  const renderDom = render
+    ? render({ ...props, form, submit, reset }, dom)
+    : dom;
   if (!renderDom) {
     return null;
   }
+
   if (Array.isArray(renderDom)) {
     if (renderDom?.length < 1) {
       return null;
@@ -117,7 +126,17 @@ const Submitter: React.FC<SubmitterProps & { form: FormInstance }> = (props) => 
     if (renderDom?.length === 1) {
       return renderDom[0] as JSX.Element;
     }
-    return <Space>{renderDom}</Space>;
+    return (
+      <div
+        style={{
+          display: 'flex',
+          gap: token.marginXS,
+          alignItems: 'center',
+        }}
+      >
+        {renderDom}
+      </div>
+    );
   }
   return renderDom as JSX.Element;
 };

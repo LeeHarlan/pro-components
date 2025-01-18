@@ -1,35 +1,41 @@
-import React, { useRef, useState } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, Select, ConfigProvider, Space } from 'antd';
-import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import ProTable from '@ant-design/pro-table';
-import moment from 'moment';
+import type { ActionType, ProColumns } from '@ant-design/pro-components';
+import { ProTable } from '@ant-design/pro-components';
+import { Button, ConfigProvider, Select, Space } from 'antd';
+import caESIntl from 'antd/lib/locale/ca_ES';
+import enGBIntl from 'antd/lib/locale/en_GB';
 import enUSIntl from 'antd/lib/locale/en_US';
-import zhCNIntl from 'antd/lib/locale/zh_CN';
-import viVNIntl from 'antd/lib/locale/vi_VN';
+import esESIntl from 'antd/lib/locale/es_ES';
+import frFRIntl from 'antd/lib/locale/fr_FR';
 import itITIntl from 'antd/lib/locale/it_IT';
 import jaJPIntl from 'antd/lib/locale/ja_JP';
-import esESIntl from 'antd/lib/locale/es_ES';
+import msMYIntl from 'antd/lib/locale/ms_MY';
+import ptBRIntl from 'antd/lib/locale/pt_BR';
 import ruRUIntl from 'antd/lib/locale/ru_RU';
 import srRSIntl from 'antd/lib/locale/sr_RS';
-import msMYIntl from 'antd/lib/locale/ms_MY';
+import thTHIntl from 'antd/lib/locale/th_TH';
+import viVNIntl from 'antd/lib/locale/vi_VN';
+import zhCNIntl from 'antd/lib/locale/zh_CN';
 import zhTWIntl from 'antd/lib/locale/zh_TW';
-import frFRIntl from 'antd/lib/locale/fr_FR';
-import ptBRIntl from 'antd/lib/locale/pt_BR';
+import dayjs from 'dayjs';
+import { useRef, useState } from 'react';
 
 const intlMap = {
   zhCNIntl,
   enUSIntl,
+  enGBIntl,
   viVNIntl,
   itITIntl,
   jaJPIntl,
   esESIntl,
+  caESIntl,
   ruRUIntl,
   srRSIntl,
   msMYIntl,
   zhTWIntl,
   frFRIntl,
   ptBRIntl,
+  thTHIntl,
 };
 
 type GithubIssueItem = {
@@ -52,14 +58,9 @@ const columns: ProColumns<GithubIssueItem>[] = [
     title: 'Money',
     dataIndex: 'title',
     width: 100,
+    order: 1,
     valueType: 'money',
     renderText: () => (Math.random() * 100).toFixed(2),
-  },
-  {
-    title: 'Created Time',
-    key: 'since',
-    dataIndex: 'createdAt',
-    valueType: 'dateTime',
   },
 ];
 
@@ -67,7 +68,7 @@ export default () => {
   const actionRef = useRef<ActionType>();
   const [intl, setIntl] = useState('zhCNIntl');
   return (
-    <ConfigProvider locale={intlMap[intl]}>
+    <ConfigProvider locale={intlMap[intl as 'zhCNIntl']}>
       <ProTable<GithubIssueItem>
         columns={columns}
         actionRef={actionRef}
@@ -93,13 +94,16 @@ export default () => {
           <Space>
             <span>Basic Table</span>
             <Select<string>
-              bordered={false}
+              variant="borderless"
               value={intl}
               onChange={(value) => {
-                moment.locale(intlMap[value].locale);
+                dayjs.locale(intlMap[value as 'zhCNIntl'].locale);
                 setIntl(value);
               }}
-              options={Object.keys(intlMap).map((value) => ({ value, label: value }))}
+              options={Object.keys(intlMap).map((value) => ({
+                value,
+                label: value,
+              }))}
             />
           </Space>
         }

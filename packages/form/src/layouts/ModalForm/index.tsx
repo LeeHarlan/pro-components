@@ -1,40 +1,61 @@
-﻿import React, {
+﻿import { openVisibleCompatible } from '@ant-design/pro-utils';
+import type { FormProps, ModalProps } from 'antd';
+import { ConfigProvider, Modal } from 'antd';
+import useMergedState from 'rc-util/lib/hooks/useMergedState';
+import { merge } from 'rc-util/lib/utils/set';
+import { noteOnce } from 'rc-util/lib/warning';
+import React, {
+  useCallback,
   useContext,
-  useState,
   useEffect,
   useImperativeHandle,
   useMemo,
   useRef,
+  useState,
 } from 'react';
-import { Modal, ConfigProvider } from 'antd';
-import type { FormInstance, ModalProps, FormProps } from 'antd';
-import useMergedState from 'rc-util/lib/hooks/useMergedState';
-import omit from 'omit.js';
 import { createPortal } from 'react-dom';
+import type { CommonFormProps, ProFormInstance } from '../../BaseForm';
+import { BaseForm } from '../../BaseForm';
+import { SubmitterProps } from '../../components/Submitter';
 
-import type { CommonFormProps } from '../../BaseForm';
-import BaseForm from '../../BaseForm';
-import { noteOnce } from 'rc-util/lib/warning';
-import ScrollLocker from 'rc-util/lib/Dom/scrollLocker';
-
-export type ModalFormProps<T = Record<string, any>> = Omit<FormProps<T>, 'onFinish' | 'title'> &
-  CommonFormProps<T> & {
+export type ModalFormProps<
+  T = Record<string, any>,
+  U = Record<string, any>,
+> = Omit<FormProps<T>, 'onFinish' | 'title'> &
+  CommonFormProps<T, U> & {
     /**
-     * 接受返回一个boolean，返回 true 会关掉这个弹窗
+     * 接收任意值，返回 真值 会关掉这个抽屉
      *
      * @name 表单结束后调用
+     *
+     * @example 结束后关闭抽屉
+     * onFinish: async ()=> {await save(); return true}
+     *
+     * @example 结束后不关闭抽屉
+     * onFinish: async ()=> {await save(); return false}
      */
-    onFinish?: (formData: T) => Promise<boolean | void>;
+    onFinish?: (formData: T) => Promise<any>;
+
+    /** @name 提交数据时，禁用取消按钮的超时时间（毫秒）。 */
+    submitTimeout?: number;
 
     /** @name 用于触发抽屉打开的 dom */
     trigger?: JSX.Element;
 
     /** @name 受控的打开关闭 */
-    visible?: ModalProps['visible'];
+    open?: ModalProps['open'];
+
+    /**
+     * @deprecated use onOpenChange replace
+     */
+    onVisibleChange?: (visible: boolean) => void;
+    /**
+     * @deprecated use open replace
+     */
+    visible?: boolean;
 
     /** @name 打开关闭的事件 */
-    onVisibleChange?: (visible: boolean) => void;
-
+    onOpenChange?: (open: boolean) => void;
     /**
      * 不支持 'visible'，请使用全局的 visible
      *
@@ -49,162 +70,227 @@ export type ModalFormProps<T = Record<string, any>> = Omit<FormProps<T>, 'onFini
     width?: ModalProps['width'];
   };
 
-function ModalForm<T = Record<string, any>>({
+function ModalForm<T = Record<string, any>, U = Record<string, any>>({
   children,
   trigger,
   onVisibleChange,
+  onOpenChange,
   modalProps,
   onFinish,
+  submitTimeout,
   title,
   width,
+  visible: propVisible,
+  open: propsOpen,
   ...rest
-}: ModalFormProps<T>) {
-  const [visible, setVisible] = useMergedState<boolean>(!!rest.visible, {
-    value: rest.visible,
-    onChange: onVisibleChange,
-  });
-
-  const [scrollLocker] = useState(() => new ScrollLocker());
-
+}: ModalFormProps<T, U>) {
   noteOnce(
     // eslint-disable-next-line @typescript-eslint/dot-notation
-    !rest['footer'] || !modalProps?.footer,
+    !(rest as any)['footer'] || !modalProps?.footer,
     'ModalForm 是一个 ProForm 的特殊布局，如果想自定义按钮，请使用 submit.render 自定义。',
   );
 
   const context = useContext(ConfigProvider.ConfigContext);
 
-  useEffect(() => {
-    if (visible) {
-      scrollLocker?.lock?.();
-    } else {
-      scrollLocker?.unLock?.();
+  const [, forceUpdate] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const [open, setOpen] = useMergedState<boolean>(!!propVisible, {
+    value: propsOpen || propVisible,
+    onChange: onOpenChange || onVisibleChange,
+  });
+
+  const footerRef = useRef<HTMLDivElement | null>(null);
+
+  const footerDomRef: React.RefCallback<HTMLDivElement> = useCallback(
+    (element) => {
+      if (footerRef.current === null && element) {
+        forceUpdate([]);
+      }
+      footerRef.current = element;
+    },
+    [],
+  );
+
+  const formRef = useRef<ProFormInstance>();
+
+  const resetFields = useCallback(() => {
+    const form = rest.form ?? rest.formRef?.current ?? formRef.current;
+    // 重置表单
+    if (form && modalProps?.destroyOnClose) {
+      form.resetFields();
     }
-    if (visible && rest.visible) {
+  }, [modalProps?.destroyOnClose, rest.form, rest.formRef]);
+
+  useImperativeHandle(
+    rest.formRef,
+    () => {
+      return formRef.current;
+    },
+    [formRef.current],
+  );
+
+  useEffect(() => {
+    if (propsOpen || propVisible) {
+      onOpenChange?.(true);
       onVisibleChange?.(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible]);
+  }, [propVisible, propsOpen]);
 
-  useEffect(() => () => {
-    scrollLocker?.unLock?.();
-  });
+  const triggerDom = useMemo(() => {
+    if (!trigger) {
+      return null;
+    }
 
-  /** 设置 trigger 的情况下，懒渲染优化性能；使之可以直接配合表格操作等场景使用 */
-  const isFirstRender = useRef(!modalProps?.forceRender);
-  /**
-   * IsFirstRender.current 或者 visible 为 true 的时候就渲染 不渲染能会造成一些问题, 比如再次打开值不对了 只有手动配置
-   * drawerProps?.destroyOnClose 为 true 的时候才会每次关闭的时候删除 dom
-   */
-  const shouldRenderFormItems = useMemo(() => {
-    if (isFirstRender.current && visible === false) {
+    return React.cloneElement(trigger, {
+      key: 'trigger',
+      ...trigger.props,
+      onClick: async (e: any) => {
+        setOpen(!open);
+        trigger.props?.onClick?.(e);
+      },
+    });
+  }, [setOpen, trigger, open]);
+
+  const submitterConfig = useMemo(() => {
+    if (rest.submitter === false) {
       return false;
     }
-    if (visible === false && modalProps?.destroyOnClose) {
-      return false;
-    }
-    return true;
-  }, [visible, modalProps?.destroyOnClose]);
 
-  /** 同步 props 和 本地的 ref */
-  const formRef = useRef<FormInstance>();
+    return merge(
+      {
+        searchConfig: {
+          submitText:
+            modalProps?.okText ?? context.locale?.Modal?.okText ?? '确认',
+          resetText:
+            modalProps?.cancelText ??
+            context.locale?.Modal?.cancelText ??
+            '取消',
+        },
+        resetButtonProps: {
+          preventDefault: true,
+          // 提交表单loading时，不可关闭弹框
+          disabled: submitTimeout ? loading : undefined,
+          onClick: (e: any) => {
+            setOpen(false);
+            // fix: #6006 点击取消按钮时,那么必然会触发弹窗关闭，我们无需在 此处重置表单，只需在弹窗关闭时重置即可
+            modalProps?.onCancel?.(e);
+          },
+        },
+      } as SubmitterProps,
+      rest.submitter ?? {},
+    );
+  }, [
+    context.locale?.Modal?.cancelText,
+    context.locale?.Modal?.okText,
+    modalProps,
+    rest.submitter,
+    setOpen,
+    loading,
+    submitTimeout,
+  ]);
 
-  /** 如果 destroyOnClose ，重置一下表单 */
-  useEffect(() => {
-    if (visible) {
-      isFirstRender.current = false;
-    }
-    // 再打开的时候重新刷新，会让 initialValues 生效
-    if (visible && modalProps?.destroyOnClose) {
-      formRef.current?.resetFields();
-    }
-  }, [modalProps?.destroyOnClose, visible]);
+  const contentRender = useCallback((formDom: any, submitter: any) => {
+    return (
+      <>
+        {formDom}
+        {footerRef.current && submitter ? (
+          <React.Fragment key="submitter">
+            {createPortal(submitter, footerRef.current)}
+          </React.Fragment>
+        ) : (
+          submitter
+        )}
+      </>
+    );
+  }, []);
 
-  useImperativeHandle(rest.formRef, () => formRef.current);
+  const onFinishHandle = useCallback(
+    async (values: T) => {
+      const response = onFinish?.(values);
 
-  const renderDom = useMemo(() => {
-    if (modalProps?.getContainer) {
-      if (typeof modalProps?.getContainer === 'function') {
-        return modalProps?.getContainer?.();
+      if (submitTimeout && response instanceof Promise) {
+        setLoading(true);
+
+        const timer = setTimeout(() => setLoading(false), submitTimeout);
+        response.finally(() => {
+          clearTimeout(timer);
+          setLoading(false);
+        });
       }
-      if (typeof modalProps?.getContainer === 'string') {
-        return document.getElementById(modalProps?.getContainer);
+      const result = await response;
+      // 返回真值，关闭弹框
+      if (result) {
+        setOpen(false);
       }
-      return modalProps?.getContainer;
-    }
-    return context?.getPopupContainer?.(document.body);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [context, modalProps, visible]);
+      return result;
+    },
+    [onFinish, setOpen, submitTimeout],
+  );
+
+  const modalOpenProps = openVisibleCompatible(open);
 
   return (
     <>
-      {createPortal(
-        <div onClick={(e) => e.stopPropagation()}>
-          <BaseForm
-            layout="vertical"
-            {...omit(rest, ['visible'])}
-            formRef={formRef}
-            onFinish={async (values) => {
-              if (!onFinish) {
-                return;
-              }
-              const success = await onFinish(values);
-              if (success) {
-                formRef.current?.resetFields();
-                setVisible(false);
-              }
-            }}
-            submitter={{
-              searchConfig: {
-                submitText: modalProps?.okText || context.locale?.Modal?.okText || '确认',
-                resetText: modalProps?.cancelText || context.locale?.Modal?.cancelText || '取消',
-              },
-              submitButtonProps: {
-                type: (modalProps?.okType as 'text') || 'primary',
-              },
-              resetButtonProps: {
-                preventDefault: true,
-                onClick: (e) => {
-                  modalProps?.onCancel?.(e);
-                  setVisible(false);
-                },
-              },
-              ...rest.submitter,
-            }}
-            contentRender={(item, submitter) => {
-              return (
-                <Modal
-                  title={title}
-                  width={width || 800}
-                  {...modalProps}
-                  getContainer={false}
-                  visible={visible}
-                  onCancel={(e) => {
-                    setVisible(false);
-                    modalProps?.onCancel?.(e);
-                  }}
-                  footer={submitter}
-                >
-                  {shouldRenderFormItems ? item : null}
-                </Modal>
-              );
-            }}
-          >
-            {children}
-          </BaseForm>
-        </div>,
-        renderDom || document.body,
-      )}
-      {trigger &&
-        React.cloneElement(trigger, {
-          ...trigger.props,
-          onClick: (e: any) => {
-            setVisible(!visible);
-            trigger.props?.onClick?.(e);
-          },
-        })}
+      <Modal
+        title={title}
+        width={width || 800}
+        {...modalProps}
+        {...modalOpenProps}
+        onCancel={(e) => {
+          // 提交表单loading时，阻止弹框关闭
+          if (submitTimeout && loading) return;
+          setOpen(false);
+          modalProps?.onCancel?.(e);
+        }}
+        afterClose={() => {
+          resetFields();
+          if (open) {
+            setOpen(false);
+          }
+          modalProps?.afterClose?.();
+        }}
+        footer={
+          rest.submitter !== false ? (
+            <div
+              ref={footerDomRef}
+              style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+              }}
+            />
+          ) : null
+        }
+      >
+        <BaseForm<T, U>
+          formComponentType="ModalForm"
+          layout="vertical"
+          {...rest}
+          onInit={(_, form) => {
+            if (rest.formRef) {
+              (
+                rest.formRef as React.MutableRefObject<ProFormInstance<T>>
+              ).current = form;
+            }
+            rest?.onInit?.(_, form);
+            formRef.current = form;
+          }}
+          formRef={formRef}
+          submitter={submitterConfig}
+          onFinish={async (values) => {
+            const result = await onFinishHandle(values);
+            // fix: #6006 如果 result 为 true,那么必然会触发弹窗关闭，我们无需在 此处重置表单，只需在弹窗关闭时重置即可
+            return result;
+          }}
+          contentRender={contentRender}
+        >
+          {children}
+        </BaseForm>
+      </Modal>
+      {triggerDom}
     </>
   );
 }
 
-export default ModalForm;
+export { ModalForm };

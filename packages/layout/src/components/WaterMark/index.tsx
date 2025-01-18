@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useContext } from 'react';
+import { useToken } from '@ant-design/pro-provider';
 import { ConfigProvider } from 'antd';
+
 import classNames from 'classnames';
+import React, { useContext, useEffect, useState } from 'react';
 
 export type WaterMarkProps = {
   /** 类名 */
@@ -32,7 +34,7 @@ export type WaterMarkProps = {
   /** 高清印图片源, 为了高清屏幕显示，建议使用 2倍或3倍图，优先使用图片渲染水印。 */
   image?: string;
   /** 水印文字内容 */
-  content?: string;
+  content?: string | string[];
   /** 文字颜色 */
   fontColor?: string;
   /** 文字样式 */
@@ -43,6 +45,8 @@ export type WaterMarkProps = {
   fontWeight?: 'normal' | 'light' | 'weight' | number;
   /** 文字大小 */
   fontSize?: number | string;
+
+  children?: React.ReactNode;
 };
 /**
  * 返回当前显示设备的物理像素分辨率与CSS像素分辨率之比
@@ -60,12 +64,12 @@ const getPixelRatio = (context: any) => {
     context.mozBackingStorePixelRatio ||
     context.msBackingStorePixelRatio ||
     context.oBackingStorePixelRatio ||
-    context.backingStorePixelRatio ||
     1;
   return (window.devicePixelRatio || 1) / backingStore;
 };
 
-const WaterMark: React.FC<WaterMarkProps> = (props) => {
+export const WaterMark: React.FC<WaterMarkProps> = (props) => {
+  const { token } = useToken();
   const {
     children,
     style,
@@ -80,12 +84,11 @@ const WaterMark: React.FC<WaterMarkProps> = (props) => {
     height = 64,
     rotate = -22, // 默认旋转 -22 度
     image,
-    content,
     offsetLeft,
-    offsetTop,
+    offsetTop: outOffsetTop,
     fontStyle = 'normal',
     fontWeight = 'normal',
-    fontColor = 'rgba(0,0,0,.15)',
+    fontColor = token.colorFill,
     fontSize = 16,
     fontFamily = 'sans-serif',
     prefixCls: customizePrefixCls,
@@ -94,7 +97,7 @@ const WaterMark: React.FC<WaterMarkProps> = (props) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const prefixCls = getPrefixCls('pro-layout-watermark', customizePrefixCls);
   const wrapperCls = classNames(`${prefixCls}-wrapper`, className);
-  const waterMakrCls = classNames(prefixCls, markClassName);
+  const waterMarkCls = classNames(prefixCls, markClassName);
   const [base64Url, setBase64Url] = useState('');
 
   useEffect(() => {
@@ -105,43 +108,64 @@ const WaterMark: React.FC<WaterMarkProps> = (props) => {
     const canvasWidth = `${(gapX + width) * ratio}px`;
     const canvasHeight = `${(gapY + height) * ratio}px`;
     const canvasOffsetLeft = offsetLeft || gapX / 2;
-    const canvasOffsetTop = offsetTop || gapY / 2;
+    const canvasOffsetTop = outOffsetTop || gapY / 2;
 
     canvas.setAttribute('width', canvasWidth);
     canvas.setAttribute('height', canvasHeight);
 
-    if (ctx) {
-      // 旋转字符 rotate
-      ctx.translate(canvasOffsetLeft * ratio, canvasOffsetTop * ratio);
-      ctx.rotate((Math.PI / 180) * Number(rotate));
-      const markWidth = width * ratio;
-      const markHeight = height * ratio;
-
-      if (image) {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.referrerPolicy = 'no-referrer';
-        img.src = image;
-        img.onload = () => {
-          ctx.drawImage(img, 0, 0, markWidth, markHeight);
-          setBase64Url(canvas.toDataURL());
-        };
-      } else if (content) {
-        const markSize = Number(fontSize) * ratio;
-        ctx.font = `${fontStyle} normal ${fontWeight} ${markSize}px/${markHeight}px ${fontFamily}`;
-        ctx.fillStyle = fontColor;
-        ctx.fillText(content, 0, 0);
-        setBase64Url(canvas.toDataURL());
-      }
-    } else {
+    if (!ctx) {
       // eslint-disable-next-line no-console
       console.error('当前环境不支持Canvas');
+      return;
+    }
+
+    // 旋转字符 rotate
+    ctx.translate(canvasOffsetLeft * ratio, canvasOffsetTop * ratio);
+    ctx.rotate((Math.PI / 180) * Number(rotate));
+    const markWidth = width * ratio;
+    const markHeight = height * ratio;
+
+    const writeContent = (
+      contentText: string | string[],
+      offsetTop: number = 0,
+    ) => {
+      const markSize = Number(fontSize) * ratio;
+      ctx.font = `${fontStyle} normal ${fontWeight} ${markSize}px/${markHeight}px ${fontFamily}`;
+      ctx.fillStyle = fontColor;
+      if (Array.isArray(contentText)) {
+        contentText?.forEach((item: string, index: number) =>
+          ctx.fillText(item, 0, index * markSize + offsetTop),
+        );
+      } else {
+        ctx.fillText(contentText, 0, offsetTop ? offsetTop + markSize : 0);
+      }
+      setBase64Url(canvas.toDataURL());
+    };
+
+    if (image) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.referrerPolicy = 'no-referrer';
+      img.src = image;
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, markWidth, markHeight);
+        setBase64Url(canvas.toDataURL());
+        if (props.content) {
+          writeContent(props.content, img.height + 8);
+          return;
+        }
+      };
+      return;
+    }
+    if (props.content) {
+      writeContent(props.content);
+      return;
     }
   }, [
     gapX,
     gapY,
     offsetLeft,
-    offsetTop,
+    outOffsetTop,
     rotate,
     fontStyle,
     fontWeight,
@@ -150,7 +174,7 @@ const WaterMark: React.FC<WaterMarkProps> = (props) => {
     fontFamily,
     fontColor,
     image,
-    content,
+    props.content,
     fontSize,
   ]);
 
@@ -164,7 +188,7 @@ const WaterMark: React.FC<WaterMarkProps> = (props) => {
     >
       {children}
       <div
-        className={waterMakrCls}
+        className={waterMarkCls}
         style={{
           zIndex,
           position: 'absolute',
@@ -175,12 +199,14 @@ const WaterMark: React.FC<WaterMarkProps> = (props) => {
           backgroundSize: `${gapX + width}px`,
           pointerEvents: 'none',
           backgroundRepeat: 'repeat',
-          backgroundImage: `url('${base64Url}')`,
+          ...(base64Url
+            ? {
+                backgroundImage: `url('${base64Url}')`,
+              }
+            : {}),
           ...markStyle,
         }}
       />
     </div>
   );
 };
-
-export default WaterMark;

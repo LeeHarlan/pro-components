@@ -1,7 +1,7 @@
-import type { ReactText } from 'react';
-import React, { useState } from 'react';
-import { Progress, Button } from 'antd';
-import ProList from '@ant-design/pro-list';
+import { ProList } from '@ant-design/pro-components';
+import { Button, Progress } from 'antd';
+import type { Key } from 'react';
+import { useState } from 'react';
 
 const dataSource = [
   {
@@ -27,10 +27,10 @@ const dataSource = [
 ];
 
 export default () => {
-  const [selectedRowKeys, setSelectedRowKeys] = useState<ReactText[]>([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
   const rowSelection = {
     selectedRowKeys,
-    onChange: (keys: ReactText[]) => setSelectedRowKeys(keys),
+    onChange: (keys: Key[]) => setSelectedRowKeys(keys),
   };
 
   return (

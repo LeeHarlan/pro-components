@@ -1,9 +1,8 @@
-import React, { useRef } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, Tag, Space, Input } from 'antd';
-import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import ProTable, { TableDropdown } from '@ant-design/pro-table';
-import request from 'umi-request';
+import type { ActionType, ProColumns } from '@ant-design/pro-components';
+import { ProTable, TableDropdown } from '@ant-design/pro-components';
+import { Button, ConfigProvider, Input, Space, Tag } from 'antd';
+import { useRef } from 'react';
 
 type GithubIssueItem = {
   url: string;
@@ -57,7 +56,7 @@ const columns: ProColumns<GithubIssueItem>[] = [
     copyable: true,
     ellipsis: true,
     hideInForm: true,
-    tip: '标题过长会自动收缩',
+    tooltip: '标题过长会自动收缩',
     formItemProps: {
       rules: [
         {
@@ -72,7 +71,10 @@ const columns: ProColumns<GithubIssueItem>[] = [
     title: '状态',
     dataIndex: 'state',
     initialValue: 'all',
+    copyable: true,
+    ellipsis: true,
     onFilter: true,
+    valueType: 'select',
     order: 2,
     fieldProps: {
       noStyle: true,
@@ -102,6 +104,7 @@ const columns: ProColumns<GithubIssueItem>[] = [
     formItemProps: {
       noStyle: true,
     },
+    ignoreFormItem: true,
     renderFormItem: () => {
       return <Input />;
     },
@@ -130,8 +133,10 @@ const columns: ProColumns<GithubIssueItem>[] = [
     title: '创建时间',
     key: 'since',
     dataIndex: 'created_at',
-    valueType: 'dateTime',
+    valueType: 'date',
     width: '20%',
+    copyable: true,
+    ellipsis: true,
     render: (value) => {
       return {
         children: value,
@@ -171,7 +176,7 @@ export default () => {
   const actionRef = useRef<ActionType>();
 
   return (
-    <>
+    <ConfigProvider prefixCls="canvas">
       <ProTable<GithubIssueItem>
         columns={columns}
         pagination={{
@@ -196,13 +201,41 @@ export default () => {
       <ProTable<GithubIssueItem>
         columns={columns}
         actionRef={(ref) => console.log(ref)}
-        request={async (params = {}) =>
-          request<{
-            data: GithubIssueItem[];
-          }>('https://proapi.azurewebsites.net/github/issues', {
-            params,
-          })
-        }
+        dataSource={[
+          {
+            id: 624748504,
+            number: 6689,
+            title: '🐛 [BUG]yarn install命令 antd2.4.5会报错',
+            labels: [{ name: 'bug', color: 'error' }],
+            state: 'open',
+            comments: 1,
+            created_at: '2020-05-26T09:42:56Z',
+            updated_at: '2020-05-26T10:03:02Z',
+            url: 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
+          },
+          {
+            id: 624691229,
+            number: 6688,
+            title: '🐛 [BUG]无法创建工程npm create umi',
+            labels: [{ name: 'bug', color: 'error' }],
+            state: 'open',
+            comments: 0,
+            created_at: '2020-05-26T08:19:22Z',
+            updated_at: '2020-05-26T08:19:22Z',
+            url: 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
+          },
+          {
+            id: 624674790,
+            number: 6685,
+            title: '🧐 [问题] build 后还存在 es6 的代码（Umi@2.13.13）',
+            labels: [{ name: 'question', color: 'success' }],
+            state: 'open',
+            comments: 0,
+            created_at: '2020-05-26T07:54:25Z',
+            updated_at: '2020-05-26T07:54:25Z',
+            url: 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
+          },
+        ]}
         pagination={{
           pageSize: 5,
         }}
@@ -216,6 +249,6 @@ export default () => {
           </Button>,
         ]}
       />
-    </>
+    </ConfigProvider>
   );
 };

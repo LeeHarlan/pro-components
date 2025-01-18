@@ -1,15 +1,17 @@
-import React from 'react';
-import ProForm, {
-  StepsForm,
-  ProFormText,
-  ProFormDatePicker,
-  ProFormSelect,
-  ProFormTextArea,
+import type { ProFormInstance } from '@ant-design/pro-components';
+import {
+  ProCard,
+  ProForm,
   ProFormCheckbox,
+  ProFormDatePicker,
   ProFormDateRangePicker,
-} from '@ant-design/pro-form';
-import ProCard from '@ant-design/pro-card';
+  ProFormSelect,
+  ProFormText,
+  ProFormTextArea,
+  StepsForm,
+} from '@ant-design/pro-components';
 import { message } from 'antd';
+import { useRef } from 'react';
 
 const waitTime = (time: number = 100) => {
   return new Promise((resolve) => {
@@ -20,13 +22,15 @@ const waitTime = (time: number = 100) => {
 };
 
 export default () => {
+  const formRef = useRef<ProFormInstance>();
+
   return (
     <ProCard>
       <StepsForm<{
         name: string;
       }>
-        onFinish={async (values) => {
-          console.log(values);
+        formRef={formRef}
+        onFinish={async () => {
           await waitTime(1000);
           message.success('提交成功');
         }}
@@ -41,8 +45,11 @@ export default () => {
         }>
           name="base"
           title="创建实验"
-          onFinish={async ({ name }) => {
-            console.log(name);
+          stepProps={{
+            description: '这里填入的都是基本信息',
+          }}
+          onFinish={async () => {
+            console.log(formRef.current?.getFieldsValue());
             await waitTime(2000);
             return true;
           }}
@@ -57,13 +64,25 @@ export default () => {
           />
           <ProFormDatePicker name="date" label="日期" />
           <ProFormDateRangePicker name="dateTime" label="时间区间" />
-          <ProFormTextArea name="remark" label="备注" width="lg" placeholder="请输入备注" />
+          <ProFormTextArea
+            name="remark"
+            label="备注"
+            width="lg"
+            placeholder="请输入备注"
+          />
         </StepsForm.StepForm>
         <StepsForm.StepForm<{
           checkbox: string;
         }>
           name="checkbox"
           title="设置参数"
+          stepProps={{
+            description: '这里填入运维参数',
+          }}
+          onFinish={async () => {
+            console.log(formRef.current?.getFieldsValue());
+            return true;
+          }}
         >
           <ProFormCheckbox.Group
             name="checkbox"
@@ -73,7 +92,11 @@ export default () => {
           />
           <ProForm.Group>
             <ProFormText name="dbname" label="业务 DB 用户名" />
-            <ProFormDatePicker name="datetime" label="记录保存时间" width="sm" />
+            <ProFormDatePicker
+              name="datetime"
+              label="记录保存时间"
+              width="sm"
+            />
             <ProFormCheckbox.Group
               name="checkbox"
               label="迁移类型"
@@ -81,7 +104,13 @@ export default () => {
             />
           </ProForm.Group>
         </StepsForm.StepForm>
-        <StepsForm.StepForm name="time" title="发布实验">
+        <StepsForm.StepForm
+          name="time"
+          title="发布实验"
+          stepProps={{
+            description: '这里填入发布判断',
+          }}
+        >
           <ProFormCheckbox.Group
             name="checkbox"
             label="部署单元"

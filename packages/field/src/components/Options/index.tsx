@@ -1,6 +1,11 @@
-import React, { useContext } from 'react';
-import { Space, ConfigProvider } from 'antd';
+import { ConfigProvider } from 'antd';
+import React, { useContext, useImperativeHandle } from 'react';
 import type { ProFieldFC } from '../../index';
+
+// 兼容代码-----------
+import { proTheme } from '@ant-design/pro-provider';
+import 'antd/lib/space/style';
+//----------------------
 
 const addArrayKeys = (doms: React.ReactNode[]) =>
   doms.map((dom, index) => {
@@ -12,6 +17,10 @@ const addArrayKeys = (doms: React.ReactNode[]) =>
       // eslint-disable-next-line react/no-array-index-key
       key: index,
       ...dom?.props,
+      style: {
+        // @ts-ignore
+        ...dom?.props?.style,
+      },
     });
   });
 
@@ -20,25 +29,39 @@ const addArrayKeys = (doms: React.ReactNode[]) =>
  *
  * @param
  */
-const FieldOptions: ProFieldFC<{}> = ({ text, mode: type, render, fieldProps }) => {
+const FieldOptions: ProFieldFC = (
+  { text, mode: type, render, fieldProps },
+  ref,
+) => {
   const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
   const className = getPrefixCls('pro-field-option');
 
+  const { token } = proTheme.useToken();
+
+  useImperativeHandle(ref, () => ({}));
+
   if (render) {
-    const doms = (render(
+    const doms = render(
       text,
       { mode: type, ...fieldProps },
       <></>,
-    ) as unknown) as React.ReactNode[];
+    ) as unknown as React.ReactNode[];
 
     if (!doms || doms?.length < 1 || !Array.isArray(doms)) {
       return null;
     }
 
     return (
-      <Space size={16} className={className}>
+      <div
+        style={{
+          display: 'flex',
+          gap: token.margin,
+          alignItems: 'center',
+        }}
+        className={className}
+      >
         {addArrayKeys(doms)}
-      </Space>
+      </div>
     );
   }
 
@@ -50,10 +73,17 @@ const FieldOptions: ProFieldFC<{}> = ({ text, mode: type, render, fieldProps }) 
   }
 
   return (
-    <Space size={16} className={className}>
+    <div
+      style={{
+        display: 'flex',
+        gap: token.margin,
+        alignItems: 'center',
+      }}
+      className={className}
+    >
       {addArrayKeys(text)}
-    </Space>
+    </div>
   );
 };
 
-export default FieldOptions;
+export default React.forwardRef(FieldOptions);

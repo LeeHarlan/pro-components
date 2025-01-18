@@ -1,11 +1,9 @@
 ---
 title: ProFormFields
 order: 1
-group:
-  path: /
+atomId: ProFormText
 nav:
   title: Components
-  path: /components
 ---
 
 # ProFormFields
@@ -32,40 +30,42 @@ So the props we set for ProFormText are actually for Form.Item, and the fieldPro
 
 ### Full amount of form field
 
-<code src="./demos/components-other.tsx" heigh="774px"/>
+<code src="./demos/components-other.tsx"></code>
 
 ### Query form
 
-<code src="./demos/search-select.tsx" heigh="774px" title=" Query form"/>
+<code src="./demos/search-select.tsx" oldtitle=" Query form"></code>
 
 ### Date form
 
-<code src="./demos/datatime.tsx" heigh="774px" title="Date form"/>
+<code src="./demos/datatime.tsx" oldtitle="Date form"></code>
 
 ### Upload form
 
-<code src="./demos/upload.tsx" heigh="774px" title="Upload form"/>
+<code src="./demos/upload.tsx" oldtitle="Upload form"></code>
 
 ### Structured data
 
-<code src="./demos/form-fieldset.tsx" heigh="774px" title="Structured data"/>
+<code src="./demos/form-fieldset.tsx" oldtitle="Structured data"></code>
 
 ### Read-only for form field
 
-<code src="./demos/components-other-readonly.tsx" heigh="774px"/>
+<code src="./demos/components-other-readonly.tsx" debug></code>
 
-## API
+## ProForm.Item
 
 ProForm comes with Filed , which basically corresponds to the valueType one by one.
 
 ### Generic properties
 
 | parameter | description | type | default |
-| --- | --- | --- | --- | --- |
-| width | The length of the Field, we summarize the common Field lengths and suitable scenarios, support some enumeration "xs" , "s" , "m" , "l" , "x" | `number \| "xs" \| "s" \| "m" \| "l" \| "x"` | - | tooltip |
+| --- | --- | --- | --- |
+| width | The length of the Field, we summarize the common Field lengths and suitable scenarios, support some enumeration "xs" , "s" , "m" , "l" , "x" | `number \| "xs" \| "s" \| "m" \| "l" \| "x"` | - |
+| rowProps | Passed to `Row` when `grid` mode is enabled, Applies only to `ProFormGroup`, `ProFormList`, `ProFormFieldSet` | [RowProps](https://ant.design/components/grid/#Row) | { gutter: 8 } |
+| colProps | Passed to `Col` when `grid` mode is enabled | [ColProps](https://ant.design/components/grid/#Col) | { xs: 24 } |
 | tooltip | will add an icon next to the label to show the configured information when hovered | `string \| tooltipProps` | - |
 | secondary | Whether secondary control, only valid for LightFilter | `boolean` | `false` |
-| allowClear | Support for clearing, valid for LightFilter, will also be passed to `fieldProps` | `boolean` | `true` | if actively set. |
+| allowClear | Support for clearing, valid for LightFilter, will also be passed to `fieldProps` if actively set. | `boolean` | `true` |
 
 ### Width
 
@@ -81,10 +81,15 @@ In some cases, we need to adapt the input box according to the page display, exc
 
 ### ProFormText
 
-Same as [Input](https://ant.design/components/input-cn/).
+Same as [Input](https://ant.design/components/input/).
 
 ```tsx | pure
-<ProFormText name="text" label="Name" placeholder="Please enter a name" fieldProps={inputProps} />
+<ProFormText
+  name="text"
+  label="Name"
+  placeholder="Please enter a name"
+  fieldProps={inputProps}
+/>
 ```
 
 ### ProFormCaptcha
@@ -114,7 +119,9 @@ ProFormCaptcha is a component developed to support common CAPTCHA functionality 
   // throw new Error("Error getting captcha")
   onGetCaptcha={async (phone) => {
     await waitTime(1000);
-    message.success(`phone number ${phone} Verification code sent successfully! `);
+    message.success(
+      `phone number ${phone} Verification code sent successfully! `,
+    );
   }}
 />
 ```
@@ -128,7 +135,7 @@ ProFormCaptcha is a component developed to support common CAPTCHA functionality 
 
 ### ProFormText.Password
 
-Same as [Input.Password](https://ant.design/components/input-cn/#Input.Password).
+Same as [Input.Password](https://ant.design/components/input/#Input.Password).
 
 ```tsx | pure
 <ProFormText.Password label="InputPassword" name="input-password" />
@@ -136,7 +143,7 @@ Same as [Input.Password](https://ant.design/components/input-cn/#Input.Password)
 
 ### ProFormDatePicker
 
-Same as [DatePicker](https://ant.design/components/date-picker-cn/).
+Same as [DatePicker](https://ant.design/components/date-picker/).
 
 ```tsx | pure
 <ProFormDatePicker name="date" label="date" />
@@ -144,15 +151,15 @@ Same as [DatePicker](https://ant.design/components/date-picker-cn/).
 
 ### ProFormDateTimePicker
 
-Same as [DatePicker](https://ant.design/components/date-picker-cn/).
+Same as [DatePicker](https://ant.design/components/date-picker/).
 
 ```tsx | pure
-<ProFormDateTimePicker name="datetime" label="date" />
+<ProFormDateTimePicker name="datetime" label="datetime" />
 ```
 
 ### ProFormDateRangePicker
 
-Same as [DatePicker](https://ant.design/components/date-picker-cn/).
+Same as [DatePicker.RangePicker](https://ant.design/components/date-picker/#RangePicker).
 
 ```tsx | pure
 <ProFormDateRangePicker name="dateRange" label="date" />
@@ -160,15 +167,15 @@ Same as [DatePicker](https://ant.design/components/date-picker-cn/).
 
 ### ProFormDateTimeRangePicker
 
-Same as [DatePicker](https://ant.design/components/date-picker-cn/).
+Same as [DatePicker.RangePicker](https://ant.design/components/date-picker/#RangePicker).
 
 ```tsx | pure
-<ProFormDateRangePicker name="datetimeRange" label="date" />
+<ProFormDateTimeRangePicker name="datetimeRange" label="datetime" />
 ```
 
 ### ProFormTimePicker
 
-Same as [DatePicker](https://ant.design/components/date-picker-cn/)
+Same as [DatePicker](https://ant.design/components/date-picker/)
 
 ```tsx | pure
 <ProFormDateRangePicker name="time" label="time" />
@@ -176,7 +183,7 @@ Same as [DatePicker](https://ant.design/components/date-picker-cn/)
 
 ### ProFormTextArea
 
-Same as [Input](https://ant.design/components/input-cn/).
+Same as [Input.TextArea](https://ant.design/components/input/#Input.TextArea).
 
 ```tsx | pure
 <ProFormTextArea
@@ -189,11 +196,14 @@ Same as [Input](https://ant.design/components/input-cn/).
 
 ### ProFormCheckbox
 
-> Requesting remote data is more complicated, see [here](/components/field#remote data) for details.
+> Requesting remote data is more complicated, see \[here]\(/components/field#remote data) for details.
 
-Same as [checkbox](https://ant.design/components/checkbox-cn/), but supports `options` and `layout`.
+Same as [checkbox](https://ant.design/components/checkbox/), but supports `options` and `layout`.
 
-| parameters | description | type | default | | --- | --- | --- | --- | options | options | Same as select, generates child nodes based on options, recommended. | `string[]` \| `{label:ReactNode,value:string}[]` | - | | layout | Configure the look of the checkbox to support vertical `vertical` and `horizontal` | `horizontal` \| `vertical` | - |
+| parameters | description | type | default |
+| --- | --- | --- | --- |
+| options | Same as select, generates child nodes based on options, recommended. | `string[]` \| `{label:ReactNode,value:string}[]` | - |
+| layout | Configure the look of the checkbox to support vertical `vertical` and `horizontal` | `horizontal` \| `vertical` | - |
 
 ```tsx | pure
 <ProFormCheckbox.Group
@@ -206,11 +216,14 @@ Same as [checkbox](https://ant.design/components/checkbox-cn/), but supports `op
 
 ### ProFormRadio.Group
 
-> Requesting remote data is more complicated, see [here](/components/field#remote data) for details.
+> Requesting remote data is more complicated, see \[here]\(/components/field#remote data) for details.
 
-Same as [radio](https://ant.design/components/radio-cn/) but with support for `options`.
+Same as [radio](https://ant.design/components/radio/) but with support for `options`.
 
-| parameters | description | type | default | | --- | --- | --- | --- | options | options | Same as select, generates child nodes based on options, recommended. | `string[]` \| `{label:ReactNode,value:string}[]` | - | | radioType | Set whether button mode or radio mode | `button` \| `radio` | `radio` |
+| parameters | description | type | default |
+| --- | --- | --- | --- |
+| options | Same as select, generates child nodes based on options, recommended. | `string[]` \| `{label:ReactNode,value:string}[]` | - |
+| radioType | Set whether button mode or radio mode | `default` \| `button` | `default` |
 
 ```tsx | pure
 <ProFormRadio.Group
@@ -235,7 +248,7 @@ Same as [radio](https://ant.design/components/radio-cn/) but with support for `o
 
 ### ProFormSwitch
 
-与 [switch](https://ant.design/components/switch-cn/) 相同。
+Same as [switch](https://ant.design/components/switch/).
 
 ```tsx | pure
 <ProFormSwitch name="switch" label="Switch" />
@@ -243,7 +256,7 @@ Same as [radio](https://ant.design/components/radio-cn/) but with support for `o
 
 ### ProFormRate
 
-与 [rate](https://ant.design/components/rate-cn/) 相同。
+Same as [rate](https://ant.design/components/rate/).
 
 ```tsx | pure
 <ProFormRate name="rate" label="Rate" />
@@ -251,7 +264,7 @@ Same as [radio](https://ant.design/components/radio-cn/) but with support for `o
 
 ### ProFormSlider
 
-与 [slider](https://ant.design/components/slider-cn/) 相同。
+Same as [slider](https://ant.design/components/slider/).
 
 ```tsx | pure
 <ProFormSlider
@@ -270,13 +283,13 @@ Same as [radio](https://ant.design/components/radio-cn/) but with support for `o
 
 ### ProFormUploadDragger
 
-Same as [upload](https://ant.design/components/upload-cn/). Dragger style is preset, otherwise it is the same as Upload.
+Same as [upload](https://ant.design/components/upload/). Dragger style is preset, otherwise it is the same as Upload.
 
-| Parameters  | Description               | Type            | Default                          |
-| ----------- | ------------------------- | --------------- | -------------------------------- | -------------------------------------------- |
-| icon        | The chart of the Dragger. | `ReactNode`     | InboxOutlined                    |
-| title       | Title                     | Dragger's title | `ReactNode`                      | 'Click or drag files to this area to upload' |
-| description | Dragger's description     | `ReactNode`     | 'Support single or bulk uploads' |
+| Parameters | Description | Type | Default |
+| --- | --- | --- | --- |
+| icon | The chart of the Dragger. | `ReactNode` | InboxOutlined |
+| title | Dragger's title | `ReactNode` | 'Click or drag files to this area to upload' |
+| description | Dragger's description | `ReactNode` | 'Support single or bulk uploads' |
 
 ```tsx | pure
 <ProFormUploadDragger label="Dragger" name="dragger" action="upload.do" />
@@ -284,7 +297,7 @@ Same as [upload](https://ant.design/components/upload-cn/). Dragger style is pre
 
 ### ProFormUploadButton
 
-Same as [upload](https://ant.design/components/upload-cn/). The Button style is preset, otherwise it is the same as Upload.
+Same as [upload](https://ant.design/components/upload/). The Button style is preset, otherwise it is the same as Upload.
 
 | Parameters | Description           | Type        | Default         |
 | ---------- | --------------------- | ----------- | --------------- |
@@ -297,15 +310,15 @@ Same as [upload](https://ant.design/components/upload-cn/). The Button style is 
 
 ### ProFormSelect
 
-Same as [select](https://ant.design/components/select-cn/). Both request and valueEnum are supported to generate options.
+Same as [select](https://ant.design/components/select/). Both request and valueEnum are supported to generate options.
 
-> Requesting remote data is more complicated, see [here](/components/field#remote data) for details.
+> Requesting remote data is more complicated, see \[here]\(/components/field#remote data) for details.
 
 > Why support valueEnum when you have options? valueEnum can be used with tables, descriptions, and has engineering advantages.
 
 | parameters | description | type | default |
 | --- | --- | --- | --- |
-| valueEnum | Enumeration of current values [valueEnum](/components/table#valueenum) | `{[key:string`\|`number]:any}` | - |
+| valueEnum | Enumeration of current values [valueEnum](/components/table#valueenum) | `Record` | - |
 | request | Enumerate data from network requests | `()=>Promise<{[key:string`\|`number]:any}>` | - |
 
 ```tsx | pure
@@ -336,9 +349,100 @@ Same as [select](https://ant.design/components/select-cn/). Both request and val
 </>
 ```
 
+Customize options：
+
+```tsx | pure
+<ProFormSelect
+  name="select"
+  label="Select"
+  options={[
+    { label: '全部', value: 'all' },
+    { label: '未解决', value: 'open' },
+    { label: '已解决', value: 'closed' },
+    { label: '解决中', value: 'processing' },
+  ]}
+  fieldProps={{
+    optionItemRender(item) {
+      return item.label + ' - ' + item.value;
+    },
+  }}
+  placeholder="Please select a country"
+  rules={[{ required: true, message: 'Please select your country!' }]}
+/>
+```
+
+### ProFormTreeSelect
+
+Same as [tree-select](https://ant.design/components/tree-select/). Both request and valueEnum are supported to generate options.
+
+> Requesting remote data is more complicated, see \[here]\(/components/field#remote data) for details.
+
+> Why support valueEnum when you have options? valueEnum can be used with tables, descriptions, and has engineering advantages.
+
+| parameters | description | type | default |
+| --- | --- | --- | --- |
+| valueEnum | Enumeration of current values [valueEnum](/components/table#valueenum) | `Record` | - |
+| request | Enumerate data from network requests | `()=>Promise<{[key:string`\|`number]:any}>` | - |
+
+```tsx | pure
+<ProFormTreeSelect
+  name="name"
+  placeholder="Please select"
+  allowClear
+  width={330}
+  secondary
+  request={async () => {
+    return [
+      {
+        title: 'Node1',
+        value: '0-0',
+        children: [
+          {
+            title: 'Child Node1',
+            value: '0-0-0',
+          },
+        ],
+      },
+      {
+        title: 'Node2',
+        value: '0-1',
+        children: [
+          {
+            title: 'Child Node3',
+            value: '0-1-0',
+          },
+          {
+            title: 'Child Node4',
+            value: '0-1-1',
+          },
+          {
+            title: 'Child Node5',
+            value: '0-1-2',
+          },
+        ],
+      },
+    ];
+  }}
+  // tree-select args
+  fieldProps={{
+    suffixIcon: null,
+    filterTreeNode: true,
+    showSearch: true,
+    popupMatchSelectWidth: false,
+    labelInValue: true,
+    autoClearSearchValue: true,
+    multiple: true,
+    treeNodeFilterProp: 'title',
+    fieldNames: {
+      label: 'title',
+    },
+  }}
+/>
+```
+
 ### ProFormDigit
 
-Same as [inputNumber](https://ant.design/components/input-number-cn/). It comes with a formatting (retains 2 decimal places, minimum value is 0), you can turn it off if needed.
+Same as [inputNumber](https://ant.design/components/input-number/). It comes with a formatting (retains 2 decimal places, minimum value is 0), you can turn it off if needed.
 
 ```tsx | pure
 <ProFormDigit label="InputNumber" name="input-number" min={1} max={10} />
@@ -354,4 +458,72 @@ If you want to change the number of decimal places.
   max={10}
   fieldProps={{ precision: 0 }}
 />
+```
+
+### ProFormMoney
+
+ProFormMoney's input box for entering amounts supports the display of currency symbols based on global internationalization, negative input, custom currency symbols, and more.
+
+```tsx | pure
+<ProFormMoney
+  label="The minimum limit is 0"
+  name="amount1"
+  locale="en-US"
+  initialValue={22.22}
+  min={0}
+/>
+<ProFormMoney
+  label="There is no limit to the amount size"
+  name="amount2"
+  locale="en-GB"
+  initialValue={22.22}
+/>
+<ProFormMoney
+  label="Currency symbols follow global internationalization"
+  name="amount3"
+  initialValue={22.22}
+/>
+<ProFormMoney
+  label="Custom currency symbols"
+  name="amount4"
+  initialValue={22.22}
+  customSymbol="💰"
+/>
+```
+
+| parameters | description | type | default |
+| --- | --- | --- | --- |
+| locale | The internationalized region values set separately show different currency symbols depending on the region, as detailed in the region directory below | `string` | `zh-Hans-CN` |
+| customSymbol | Custom amount symbol | `string` | - |
+| numberPopoverRender | Custom Popover's value, false, can close his | `((props: InputNumberProps, defaultText: string) => React.ReactNode)` \| `boolean` | false |
+| numberFormatOptions | The configuration of NumberFormat, where the documentation can view the of the [mdn](https://developer.mozilla.org/zh-CN/docs/web/JavaScript/Reference/Global_Objects/Intl/NumberFormat)) | NumberFormatOptions | - |
+| min | The minimum value is | `number` | - |
+| max | The maximum value is | `number` | - |
+
+#### Below is a table of regional codes and currency symbols
+
+```json
+{
+"ar-EG": "$",
+"zh-CN": "¥",
+"en-US": "$",
+"en-GB": "£",
+"vi-VN": "₫",
+"it-IT": "€",
+"ja-JP": "¥",
+"es-ES": "€",
+"ru-RU": "₽",
+"sr-RS": "RSD",
+"ms-MY": "RM",
+"zh-TW": "NT$"
+"fr-FR": "€",
+"pt-BR": "R$",
+"ko-KR": "₩",
+"id-ID": "RP",
+"de-DE": "€",
+"fa-IR": "تومان",
+"tr-TR": "₺",
+"pl-PL": "zł",
+"hr-HR": "kn",
+}
 ```

@@ -1,15 +1,17 @@
-﻿import React, { useContext, useMemo } from 'react';
-import type { FormInstance, FormItemProps } from 'antd';
-import { ConfigProvider } from 'antd';
-import type { BaseQueryFilterProps, ProFormProps } from '@ant-design/pro-form';
-import classNames from 'classnames';
-import omit from 'omit.js';
+﻿import type {
+  BaseQueryFilterProps,
+  ProFormInstance,
+  ProFormProps,
+} from '@ant-design/pro-form';
 import { BetaSchemaForm } from '@ant-design/pro-form';
-
+import { ProProvider } from '@ant-design/pro-provider';
 import type { ProSchemaComponentTypes } from '@ant-design/pro-utils';
-import type { ActionType, ProColumns } from '../../typing';
-
-import './index.less';
+import type { FormItemProps } from 'antd';
+import { ConfigProvider, Table } from 'antd';
+import classNames from 'classnames';
+import omit from 'rc-util/lib/omit';
+import React, { useContext, useMemo } from 'react';
+import type { ActionType, ProColumns, ProTableProps } from '../../typing';
 
 function toLowerLine(str: string) {
   let temp = str.replace(/[A-Z]/g, (match) => {
@@ -98,14 +100,15 @@ export type TableFormItem<T, U = any> = {
   onReset?: (value: T) => void;
   form?: Omit<ProFormProps, 'form'>;
   type?: ProSchemaComponentTypes;
-  dateFormatter?: 'string' | 'number' | false;
+  dateFormatter?: ProTableProps<T, U, any>['dateFormatter'];
   search?: false | SearchConfig;
   columns: ProColumns<U, any>[];
-  formRef: React.MutableRefObject<FormInstance | undefined>;
+  formRef: React.MutableRefObject<ProFormInstance | undefined>;
   submitButtonLoading?: boolean;
   manualRequest?: boolean;
   bordered?: boolean;
   action: React.MutableRefObject<ActionType | undefined>;
+  ghost?: boolean;
 } & Omit<FormItemProps, 'children' | 'onReset'>;
 
 /**
@@ -121,13 +124,15 @@ const FormRender = <T, U = any>({
   type,
   columns,
   action,
+  ghost,
   manualRequest,
   onReset,
   submitButtonLoading,
   search: searchConfig,
-  form: formConfig = {},
+  form: formConfig,
   bordered,
 }: TableFormItem<T, U>) => {
+  const { hashId } = useContext(ProProvider);
   const isForm = type === 'form';
   /** 提交表单，根据两种模式不同，方法不相同 */
   const submit = async (values: T, firstLoad: boolean) => {
@@ -141,6 +146,9 @@ const FormRender = <T, U = any>({
   const columnsList = useMemo(() => {
     return columns
       .filter((item) => {
+        if (item === Table.EXPAND_COLUMN || item === Table.SELECTION_COLUMN) {
+          return false;
+        }
         if ((item.hideInSearch || item.search === false) && type !== 'form') {
           return false;
         }
@@ -152,14 +160,23 @@ const FormRender = <T, U = any>({
       .map((item) => {
         const finalValueType =
           !item.valueType ||
-          (['textarea', 'jsonCode', 'code'].includes(item.valueType) && type === 'table')
+          (['textarea', 'jsonCode', 'code'].includes(item?.valueType) &&
+            type === 'table')
             ? 'text'
-            : (item.valueType as 'text');
+            : (item?.valueType as 'text');
+        const columnKey = item?.key || item?.dataIndex?.toString();
+
         return {
           ...item,
           width: undefined,
-          ...(item.search ? item.search : {}),
+          ...(item.search && typeof item.search === 'object'
+            ? item.search
+            : {}),
           valueType: finalValueType,
+          proFieldProps: {
+            ...item.proFieldProps,
+            proFieldKey: columnKey ? `table-field-${columnKey}` : undefined,
+          },
         };
       });
   }, [columns, type]);
@@ -167,10 +184,10 @@ const FormRender = <T, U = any>({
   const className = getPrefixCls('pro-table-search');
   const formClassName = getPrefixCls('pro-table-form');
 
-  const competentName = useMemo(() => getFormCompetent(isForm, searchConfig), [
-    searchConfig,
-    isForm,
-  ]);
+  const competentName = useMemo(
+    () => getFormCompetent(isForm, searchConfig),
+    [searchConfig, isForm],
+  );
 
   // 传给每个表单的配置，理论上大家都需要
   const loadingProps: any = useMemo(
@@ -186,10 +203,15 @@ const FormRender = <T, U = any>({
 
   return (
     <div
-      className={classNames(className, {
+      className={classNames(hashId, {
+        [getPrefixCls('pro-card')]: true,
+        [`${getPrefixCls('pro-card')}-border`]: !!bordered,
+        [`${getPrefixCls('pro-card')}-bordered`]: !!bordered,
+        [`${getPrefixCls('pro-card')}-ghost`]: !!ghost,
+        [className]: true,
         [formClassName]: isForm,
         [getPrefixCls(`pro-table-search-${toLowerLine(competentName)}`)]: true,
-        [`${getPrefixCls('card')}-bordered`]: !!bordered,
+        [`${className}-ghost`]: ghost,
         [(searchConfig as { className: string })?.className]:
           searchConfig !== false && searchConfig?.className,
       })}
@@ -200,14 +222,26 @@ const FormRender = <T, U = any>({
         type={type}
         {...loadingProps}
         {...getFromProps(isForm, searchConfig, competentName)}
-        {...getFormConfigs(isForm, formConfig)}
+        {...getFormConfigs(isForm, formConfig || {})}
         formRef={formRef}
         action={action}
         dateFormatter={dateFormatter}
-        onInit={(values: T) => {
+        onInit={(values: T, form) => {
+          formRef.current = form;
           // 触发一个 submit，之所以这里触发是为了保证 value 都被 format了
           if (type !== 'form') {
-            // 重新计算一下dom
+            // 修改 pageSize，变成从 url 中获取的
+            const pageInfo = action.current?.pageInfo;
+            // 从 values 里获取是因为有时候要从 url中获取的 pageSize。
+            const {
+              current = pageInfo?.current,
+              pageSize = pageInfo?.pageSize,
+            } = values as any;
+            action.current?.setPageInfo?.({
+              ...pageInfo,
+              current: parseInt(current, 10),
+              pageSize: parseInt(pageSize, 10),
+            });
             /** 如果是手动模式不需要提交 */
             if (manualRequest) return;
             submit(values, true);
@@ -219,7 +253,7 @@ const FormRender = <T, U = any>({
         onFinish={(values: T) => {
           submit(values, false);
         }}
-        initialValues={formConfig.initialValues}
+        initialValues={formConfig?.initialValues}
       />
     </div>
   );

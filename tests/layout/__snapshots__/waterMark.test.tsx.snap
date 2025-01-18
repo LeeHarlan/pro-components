@@ -1,84 +1,132 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`WaterMark test image watermark 1`] = `
-<WaterMark
-  image="https://img.alicdn.com/tfs/TB1YM3LpipE_u4jSZKbXXbCUVXa-280-128.png"
-  rotate={0}
->
+exports[`WaterMark > renders watermark with custom styles 1`] = `
+<div>
   <div
-    className="ant-pro-layout-watermark-wrapper"
-    style={
-      Object {
-        "position": "relative",
-      }
-    }
+    class="ant-pro-layout-watermark-wrapper"
+    style="position: relative; background-color: rgba(0, 0, 0, 0.1);"
   >
     <div
-      style={
-        Object {
-          "height": 500,
-        }
-      }
+      style="height: 500px;"
+    >
+      Content
+    </div>
+    <div
+      class="ant-pro-layout-watermark"
+      style="z-index: 9; position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-size: 332px; pointer-events: none; background-repeat: repeat; color: red;"
+    />
+  </div>
+</div>
+`;
+
+exports[`WaterMark > renders watermark with multiline text content 1`] = `
+<div>
+  <div
+    class="ant-pro-layout-watermark-wrapper"
+    style="position: relative;"
+  >
+    <div
+      style="height: 500px;"
+    >
+      Content
+    </div>
+    <div
+      class="ant-pro-layout-watermark"
+      style="z-index: 9; position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-size: 332px; pointer-events: none; background-repeat: repeat;"
+    />
+  </div>
+</div>
+`;
+
+exports[`WaterMark > renders watermark with rotation 1`] = `
+<div>
+  <div
+    class="ant-pro-layout-watermark-wrapper"
+    style="position: relative;"
+  >
+    <div
+      style="height: 500px;"
+    >
+      Content
+    </div>
+    <div
+      class="ant-pro-layout-watermark"
+      style="z-index: 9; position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-size: 332px; pointer-events: none; background-repeat: repeat;"
+    />
+  </div>
+</div>
+`;
+
+exports[`WaterMark > renders without content when content prop is not provided 1`] = `
+<div>
+  <div
+    class="ant-pro-layout-watermark-wrapper"
+    style="position: relative;"
+  >
+    <div
+      style="height: 500px;"
+    >
+      Content
+    </div>
+    <div
+      class="ant-pro-layout-watermark"
+      style="z-index: 9; position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-size: 332px; pointer-events: none; background-repeat: repeat;"
+    />
+  </div>
+</div>
+`;
+
+exports[`WaterMark > renders without watermark when both image and content props are not provided 1`] = `
+<div>
+  <div
+    class="ant-pro-layout-watermark-wrapper"
+    style="position: relative;"
+  >
+    <div
+      style="height: 500px;"
+    >
+      Content
+    </div>
+    <div
+      class="ant-pro-layout-watermark"
+      style="z-index: 9; position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-size: 332px; pointer-events: none; background-repeat: repeat;"
+    />
+  </div>
+</div>
+`;
+
+exports[`WaterMark > test image watermark 1`] = `
+<div>
+  <div
+    class="ant-pro-layout-watermark-wrapper"
+    style="position: relative;"
+  >
+    <div
+      style="height: 500px;"
     >
       123
     </div>
     <div
-      className="ant-pro-layout-watermark"
-      style={
-        Object {
-          "backgroundImage": "url('')",
-          "backgroundRepeat": "repeat",
-          "backgroundSize": "332px",
-          "height": "100%",
-          "left": 0,
-          "pointerEvents": "none",
-          "position": "absolute",
-          "top": 0,
-          "width": "100%",
-          "zIndex": 9,
-        }
-      }
+      class="ant-pro-layout-watermark"
+      style="z-index: 9; position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-size: 332px; pointer-events: none; background-repeat: repeat; background-image: url(data:image/png;base64,00);"
     />
   </div>
-</WaterMark>
+</div>
 `;
 
-exports[`WaterMark test text watermark 1`] = `
-<WaterMark
-  content="Trusple"
->
+exports[`WaterMark > test text watermark 1`] = `
+<DocumentFragment>
   <div
-    className="ant-pro-layout-watermark-wrapper"
-    style={
-      Object {
-        "position": "relative",
-      }
-    }
+    class="ant-pro-layout-watermark-wrapper"
+    style="position: relative;"
   >
     <div
-      style={
-        Object {
-          "height": 500,
-        }
-      }
+      style="height: 500px;"
     />
     <div
-      className="ant-pro-layout-watermark"
-      style={
-        Object {
-          "backgroundImage": "url('data:image/png;base64,00')",
-          "backgroundRepeat": "repeat",
-          "backgroundSize": "332px",
-          "height": "100%",
-          "left": 0,
-          "pointerEvents": "none",
-          "position": "absolute",
-          "top": 0,
-          "width": "100%",
-          "zIndex": 9,
-        }
-      }
+      class="ant-pro-layout-watermark"
+      style="z-index: 9; position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-size: 332px; pointer-events: none; background-repeat: repeat; background-image: url(data:image/png;base64,00);"
     />
   </div>
-</WaterMark>
+</DocumentFragment>
 `;

@@ -1,76 +1,65 @@
-import type { MenuDataItem } from '../typings';
+import type { MenuDataItem } from '../typing';
 
 export const getOpenKeysFromMenuData = (menuData?: MenuDataItem[]) => {
   return (menuData || []).reduce((pre, item) => {
     if (item.key) {
       pre.push(item.key);
     }
-    if (item.children) {
-      const newArray: string[] = pre.concat(getOpenKeysFromMenuData(item.children) || []);
+    if (item.children || item.routes) {
+      const newArray: string[] = pre.concat(
+        getOpenKeysFromMenuData(item.children || item.routes) || [],
+      );
       return newArray;
     }
     return pre;
   }, [] as string[]);
 };
-
 const themeConfig = {
-  daybreak: 'daybreak',
-  '#1890ff': 'daybreak',
-  '#F5222D': 'dust',
-  '#FA541C': 'volcano',
-  '#FAAD14': 'sunset',
-  '#13C2C2': 'cyan',
-  '#52C41A': 'green',
-  '#2F54EB': 'geekblue',
-  '#722ED1': 'purple',
+  techBlue: '#1677FF',
+  daybreak: '#1890ff',
+  dust: '#F5222D',
+  volcano: '#FA541C',
+  sunset: '#FAAD14',
+  cyan: '#13C2C2',
+  green: '#52C41A',
+  geekblue: '#2F54EB',
+  purple: '#722ED1',
 };
-
-const invertKeyValues = (obj: Object) =>
-  Object.keys(obj).reduce((acc, key) => {
-    acc[obj[key]] = key;
-    return acc;
-  }, {});
-
-/**
- * #1890ff -> daybreak
- *
- * @param val
- */
-export function genThemeToString(val?: string): string {
-  return val && themeConfig[val] ? themeConfig[val] : undefined;
-}
-
 /**
  * Daybreak-> #1890ff
  *
  * @param val
  */
 export function genStringToTheme(val?: string): string {
-  const stringConfig = invertKeyValues(themeConfig);
-  return val && stringConfig[val] ? stringConfig[val] : val;
+  return val && themeConfig[val as 'techBlue']
+    ? themeConfig[val as 'techBlue']
+    : val || '';
 }
-
 export function clearMenuItem(menusData: MenuDataItem[]): MenuDataItem[] {
   return menusData
     .map((item) => {
+      const children: MenuDataItem[] = item.children || [];
       const finalItem = { ...item };
+      if (!finalItem.children && finalItem.routes) {
+        finalItem.children = finalItem.routes;
+      }
       if (!finalItem.name || finalItem.hideInMenu) {
         return null;
       }
-
       if (finalItem && finalItem?.children) {
         if (
           !finalItem.hideChildrenInMenu &&
-          finalItem.children.some((child) => child && child.name && !child.hideInMenu)
+          children.some((child) => child && child.name && !child.hideInMenu)
         ) {
           return {
             ...item,
-            children: clearMenuItem(finalItem.children),
+            children: clearMenuItem(children),
           };
         }
         // children 为空就直接删掉
         delete finalItem.children;
       }
+      delete finalItem.routes;
       return finalItem;
     })
     .filter((item) => item) as MenuDataItem[];

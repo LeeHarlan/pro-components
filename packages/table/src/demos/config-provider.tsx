@@ -1,8 +1,8 @@
-import React, { useRef } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, Tag, Space, ConfigProvider } from 'antd';
-import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import ProTable, { TableDropdown } from '@ant-design/pro-table';
+import type { ActionType, ProColumns } from '@ant-design/pro-components';
+import { ProTable, TableDropdown } from '@ant-design/pro-components';
+import { Button, ConfigProvider, Space, Tag } from 'antd';
+import { useRef } from 'react';
 import request from 'umi-request';
 
 type GithubIssueItem = {
@@ -32,7 +32,7 @@ const columns: ProColumns<GithubIssueItem>[] = [
     dataIndex: 'title',
     copyable: true,
     ellipsis: true,
-    tip: '标题过长会自动收缩',
+    tooltip: '标题过长会自动收缩',
     formItemProps: {
       rules: [
         {
@@ -82,13 +82,6 @@ const columns: ProColumns<GithubIssueItem>[] = [
     ),
   },
   {
-    title: '创建时间',
-    key: 'since',
-    dataIndex: 'created_at',
-    valueType: 'dateTime',
-    width: '20%',
-  },
-  {
     title: '操作',
     valueType: 'option',
     render: (text, row, _, action) => [
@@ -124,7 +117,7 @@ export default () => {
           showQuickJumper: true,
         }}
         actionRef={actionRef}
-        request={async (params = {}) =>
+        request={async (params = {} as Record<string, any>) =>
           request<{
             data: GithubIssueItem[];
           }>('https://proapi.azurewebsites.net/github/issues', {

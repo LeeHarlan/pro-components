@@ -1,23 +1,41 @@
-import type { CSSProperties } from 'react';
-import React from 'react';
+import { ProProvider } from '@ant-design/pro-provider';
+import { ErrorBoundary } from '@ant-design/pro-utils';
 import { Layout } from 'antd';
-import { ConfigProviderWrap } from '@ant-design/pro-provider';
+import classNames from 'classnames';
+import type { CSSProperties } from 'react';
+import React, { useContext } from 'react';
 
 const WrapContent: React.FC<{
+  hasPageContainer?: number;
   isChildrenLayout?: boolean;
-  className?: string;
+  prefixCls?: string;
   style?: CSSProperties;
   location?: any;
   contentHeight?: number | string;
+  ErrorBoundary?: any;
+  children?: React.ReactNode;
+  hasHeader: boolean;
 }> = (props) => {
-  const { style, className, children } = props;
-  return (
-    <ConfigProviderWrap>
-      <Layout.Content className={className} style={style}>
+  const { hashId } = useContext(ProProvider);
+  const { style, prefixCls, children, hasPageContainer = 0 } = props;
+
+  const contentClassName = classNames(`${prefixCls}-content`, hashId, {
+    [`${prefixCls}-has-header`]: props.hasHeader,
+    [`${prefixCls}-content-has-page-container`]: hasPageContainer > 0,
+  });
+
+  const ErrorComponent = props.ErrorBoundary || ErrorBoundary;
+  return props.ErrorBoundary === false ? (
+    <Layout.Content className={contentClassName} style={style}>
+      {children}
+    </Layout.Content>
+  ) : (
+    <ErrorComponent>
+      <Layout.Content className={contentClassName} style={style}>
         {children}
       </Layout.Content>
-    </ConfigProviderWrap>
+    </ErrorComponent>
   );
 };
 
-export default WrapContent;
+export { WrapContent };

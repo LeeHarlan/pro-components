@@ -1,6 +1,10 @@
-import React from 'react';
+import {
+  ProFormRadio,
+  ProFormSwitch,
+  ProList,
+} from '@ant-design/pro-components';
 import { Progress, Tag } from 'antd';
-import ProList from '@ant-design/pro-list';
+import { useState } from 'react';
 
 const data = [
   '语雀的天空',
@@ -14,8 +18,9 @@ const data = [
 ].map((item) => ({
   title: item,
   subTitle: <Tag color="#5BD8A6">语雀专栏</Tag>,
-  actions: [<a>邀请</a>],
-  avatar: 'https://gw.alipayobjects.com/zos/antfincdn/UCSiy1j6jx/xingzhuang.svg',
+  actions: [<a key="run">邀请</a>, <a key="delete">删除</a>],
+  avatar:
+    'https://gw.alipayobjects.com/zos/antfincdn/UCSiy1j6jx/xingzhuang.svg',
   content: (
     <div
       style={{
@@ -35,23 +40,78 @@ const data = [
 }));
 
 export default () => {
+  const [cardActionProps, setCardActionProps] = useState<'actions' | 'extra'>(
+    'extra',
+  );
+
+  const [ghost, setGhost] = useState<boolean>(false);
   return (
-    <ProList<any>
-      pagination={{
-        defaultPageSize: 8,
-        showSizeChanger: false,
+    <div
+      style={{
+        backgroundColor: '#eee',
+        margin: -24,
+        padding: 24,
       }}
-      grid={{ gutter: 16, column: 2 }}
-      metas={{
-        title: {},
-        subTitle: {},
-        type: {},
-        avatar: {},
-        content: {},
-        actions: {},
-      }}
-      headerTitle="翻页"
-      dataSource={data}
-    />
+    >
+      <ProFormRadio.Group
+        label="actions 放置的地方"
+        options={[
+          {
+            label: '设置为 action',
+            value: 'actions',
+          },
+          {
+            label: '设置为 extra',
+            value: 'extra',
+          },
+        ]}
+        fieldProps={{
+          value: cardActionProps,
+          onChange: (e) => setCardActionProps(e.target.value),
+        }}
+      />
+      <ProFormSwitch
+        label="幽灵模式"
+        fieldProps={{
+          checked: ghost,
+          onChange: (e) => setGhost(e),
+        }}
+      />
+      <ProList<any>
+        ghost={ghost}
+        itemCardProps={{
+          ghost,
+        }}
+        pagination={{
+          defaultPageSize: 8,
+          showSizeChanger: false,
+        }}
+        showActions="hover"
+        rowSelection={{}}
+        grid={{ gutter: 16, column: 2 }}
+        onItem={(record: any) => {
+          return {
+            onMouseEnter: () => {
+              console.log(record);
+            },
+            onClick: () => {
+              console.log(record);
+            },
+          };
+        }}
+        metas={{
+          title: {},
+          subTitle: {},
+          type: {},
+          avatar: {},
+          content: {},
+          actions: {
+            cardActionProps,
+          },
+        }}
+        headerTitle="卡片列表展示"
+        dataSource={data}
+      />
+    </div>
   );
 };

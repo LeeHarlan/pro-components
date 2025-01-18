@@ -1,5 +1,4 @@
-import React from 'react';
-import ProTable from '@ant-design/pro-table';
+import { ProTable } from '@ant-design/pro-components';
 
 const valueEnum = {
   0: 'close',
@@ -26,7 +25,7 @@ for (let i = 0; i < 2; i += 1) {
   tableListDataSource.push({
     key: i,
     name: `TradeCode ${i}`,
-    status: valueEnum[Math.floor(Math.random() * 10) % 4],
+    status: valueEnum[((Math.floor(Math.random() * 10) % 4) + '') as '0'],
     updatedAt: Date.now() - Math.floor(Math.random() * 1000),
     createdAt: Date.now() - Math.floor(Math.random() * 2000),
     createdAtRange: [

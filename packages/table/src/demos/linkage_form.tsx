@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
-import React, { useEffect, useState } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
+import type { ProColumns } from '@ant-design/pro-components';
+import { ProTable } from '@ant-design/pro-components';
 import { Button, Input, Select } from 'antd';
-import type { ProColumns } from '@ant-design/pro-table';
-import ProTable from '@ant-design/pro-table';
+import React, { useEffect, useState } from 'react';
 
 type GithubIssueItem = {
   key: number;
@@ -53,9 +53,16 @@ const MySelect: React.FC<{
         },
       ]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(state)]);
 
-  return <Select options={innerOptions} value={props.value} onChange={props.onChange} />;
+  return (
+    <Select
+      options={innerOptions}
+      value={props.value}
+      onChange={props.onChange}
+    />
+  );
 };
 
 export default () => {
@@ -68,6 +75,32 @@ export default () => {
     {
       title: '标题',
       dataIndex: 'name',
+    },
+    {
+      title: '动态表单',
+      key: 'direction',
+      hideInTable: true,
+      dataIndex: 'direction',
+      renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
+        if (type === 'form') {
+          return null;
+        }
+        const stateType = form.getFieldValue('state');
+        if (stateType === 3) {
+          return <Input />;
+        }
+        if (stateType === 4) {
+          return null;
+        }
+        return (
+          <MySelect
+            {...rest}
+            state={{
+              type: stateType,
+            }}
+          />
+        );
+      },
     },
     {
       title: '状态',
@@ -87,37 +120,19 @@ export default () => {
           label: '自定义',
           value: 3,
         },
+        {
+          label: '不展示',
+          value: 4,
+        },
       ],
-    },
-    {
-      title: '动态表单',
-      key: 'direction',
-      hideInTable: true,
-      dataIndex: 'direction',
-      renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
-        if (type === 'form') {
-          return null;
-        }
-        const stateType = form.getFieldValue('state');
-        if (stateType === 3) {
-          return <Input />;
-        }
-        return (
-          <MySelect
-            {...rest}
-            state={{
-              type: stateType,
-            }}
-          />
-        );
-      },
     },
   ];
 
   return (
     <ProTable<GithubIssueItem>
       columns={columns}
-      request={async () => {
+      request={async (params) => {
+        console.log(`request params:`, params);
         return {
           data: [
             {
@@ -138,7 +153,15 @@ export default () => {
         defaultCollapsed: false,
         optionRender: (searchConfig, formProps, dom) => [
           ...dom.reverse(),
-          <Button key="out">导出</Button>,
+          <Button
+            key="out"
+            onClick={() => {
+              const values = searchConfig?.form?.getFieldsValue();
+              console.log(values);
+            }}
+          >
+            导出
+          </Button>,
         ],
       }}
       toolBarRender={() => [

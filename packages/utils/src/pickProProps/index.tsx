@@ -2,10 +2,10 @@ const proFieldProps = `valueType request plain renderFormItem render text formIt
 
 const proFormProps = `fieldProps isDefaultDom groupProps contentRender submitterProps submitter`;
 
-export default function pickProProps(props: Record<string, any>) {
+export function pickProProps(props: Record<string, any>) {
   const propList = `${proFieldProps} ${proFormProps}`.split(/[\s\n]+/);
 
-  const attrs = {};
+  const attrs = {} as Record<string, any>;
   Object.keys(props || {}).forEach((key) => {
     if (propList.includes(key)) {
       return;

@@ -1,8 +1,6 @@
-import React from 'react';
-
-import type { MenuDataItem } from '@ant-design/pro-layout';
-import ProLayout, { PageContainer } from '@ant-design/pro-layout';
-import { SmileOutlined, HeartOutlined } from '@ant-design/icons';
+import { HeartOutlined, SmileOutlined } from '@ant-design/icons';
+import type { MenuDataItem } from '@ant-design/pro-components';
+import { PageContainer, ProLayout } from '@ant-design/pro-components';
 
 const IconMap = {
   smile: <SmileOutlined />,
@@ -14,12 +12,12 @@ const defaultMenus = [
     path: '/',
     name: 'welcome',
     icon: 'smile',
-    children: [
+    routes: [
       {
         path: '/welcome',
         name: 'one',
         icon: 'smile',
-        children: [
+        routes: [
           {
             path: '/welcome/welcome',
             name: 'two',
@@ -37,17 +35,17 @@ const defaultMenus = [
   },
 ];
 
-const loopMenuItem = (menus: MenuDataItem[]): MenuDataItem[] =>
-  menus.map(({ icon, children, ...item }) => ({
+const loopMenuItem = (menus: any[]): MenuDataItem[] =>
+  menus.map(({ icon, routes, ...item }) => ({
     ...item,
-    icon: icon && IconMap[icon as string],
-    children: children && loopMenuItem(children),
+    icon: icon && IconMap[icon as 'smile'],
+    children: routes && loopMenuItem(routes),
   }));
 
 export default () => (
   <ProLayout
     style={{
-      height: 500,
+      minHeight: 500,
     }}
     fixSiderbar
     location={{
@@ -59,6 +57,7 @@ export default () => (
       <div
         style={{
           height: '120vh',
+          minHeight: 600,
         }}
       >
         Hello World

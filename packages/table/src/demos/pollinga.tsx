@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { Button } from 'antd';
-import type { ProColumns } from '@ant-design/pro-table';
-import ProTable from '@ant-design/pro-table';
 import { LoadingOutlined, ReloadOutlined } from '@ant-design/icons';
-import moment from 'moment';
+import type { ProColumns } from '@ant-design/pro-components';
+import { ProTable } from '@ant-design/pro-components';
+import { Button } from 'antd';
+import dayjs from 'dayjs';
+import { useState } from 'react';
 
 const valueEnum = {
   0: 'close',
@@ -27,7 +27,7 @@ for (let i = 0; i < 2; i += 1) {
   tableListDataSource.push({
     key: i,
     name: `TradeCode ${i}`,
-    status: valueEnum[Math.floor(Math.random() * 10) % 4],
+    status: valueEnum[((Math.floor(Math.random() * 10) % 4) + '') as '0'],
     updatedAt: Date.now() - Math.floor(Math.random() * 1000),
     createdAt: Date.now() - Math.floor(Math.random() * 2000),
     money: Math.floor(Math.random() * 2000) * i,
@@ -88,7 +88,7 @@ const columns: ProColumns<TableListItem>[] = [
 
 export default () => {
   const [time, setTime] = useState(() => Date.now());
-  const [polling, setPolling] = useState<number | undefined>(2000);
+  const [polling, setPolling] = useState<number>(2000);
   return (
     <ProTable<TableListItem>
       columns={columns}
@@ -96,7 +96,7 @@ export default () => {
       pagination={{
         showSizeChanger: true,
       }}
-      polling={polling || undefined}
+      polling={polling}
       request={async () => {
         await timeAwait(2000);
         setTime(Date.now());
@@ -107,14 +107,14 @@ export default () => {
         };
       }}
       dateFormatter="string"
-      headerTitle={`上次更新时间：${moment(time).format('HH:mm:ss')}`}
+      headerTitle={`上次更新时间：${dayjs(time).format('HH:mm:ss')}`}
       toolBarRender={() => [
         <Button
           key="3"
           type="primary"
           onClick={() => {
             if (polling) {
-              setPolling(undefined);
+              setPolling(0);
               return;
             }
             setPolling(2000);

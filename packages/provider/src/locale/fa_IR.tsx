@@ -53,11 +53,19 @@ export default {
     prev: 'قبلی',
     submit: 'اتمام',
   },
+  loginForm: {
+    submitText: 'ورود',
+  },
   editableTable: {
     action: {
       save: 'ذخیره',
       cancel: 'لغو',
       delete: 'حذف',
+      add: 'یک ردیف داده اضافه کنید',
     },
+  },
+  switch: {
+    open: 'باز',
+    close: 'نزدیک',
   },
 };

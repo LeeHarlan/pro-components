@@ -1,6 +1,6 @@
 {
   "name": "@ant-design/pro-skeleton",
-  "version": "1.0.1",
+  "version": "2.2.1",
   "description": "@ant-design/pro-skeleton",
   "keywords": [
     "antd",
@@ -8,24 +8,25 @@
     "ant-design",
     "ant-design-pro"
   ],
-  "sideEffects": [
-    "*.less"
-  ],
   "homepage": "https://github.com/ant-design/pro-components/tree/master/packages/skeleton#readme",
   "bugs": "http://github.com/umijs/plugins/issues",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ant-design/pro-components"
+    "url": "git+https://github.com/ant-design/pro-components.git"
   },
   "license": "MIT",
+  "sideEffects": false,
   "main": "lib/index.js",
   "module": "es/index.js",
-  "types": "lib/index.d.ts",
+  "types": "es/index.d.ts",
   "files": [
-    "lib",
     "es",
+    "lib",
     "dist"
   ],
+  "scripts": {
+    "build": "father build"
+  },
   "browserslist": [
     "last 2 versions",
     "Firefox ESR",
@@ -33,11 +34,15 @@
     "ie >= 11"
   ],
   "dependencies": {
-    "use-media-antd-query": "^1.0.6"
+    "@babel/runtime": "^7.18.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.4"
   },
   "peerDependencies": {
-    "antd": "4.x",
-    "react": ">=16.9.0"
+    "antd": "^4.24.15 || ^5.11.2",
+    "react": ">=17.0.0",
+    "react-dom": ">=17.0.0"
   },
   "publishConfig": {
     "access": "public"

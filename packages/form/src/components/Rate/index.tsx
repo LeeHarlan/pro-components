@@ -1,22 +1,28 @@
-import React from 'react';
-import ProField from '@ant-design/pro-field';
 import type { RateProps } from 'antd';
-import type { ProFormItemProps } from '../../interface';
-import createField from '../../BaseForm/createField';
+import React from 'react';
+import type { ProFormFieldItemProps } from '../../typing';
+import ProField from '../Field';
 /**
  * 评分组件
  *
  * @param
  */
-const ProFormRate: React.ForwardRefRenderFunction<any, ProFormItemProps<RateProps>> = (
-  { fieldProps, proFieldProps },
-  ref,
-) => {
+const ProFormRate: React.ForwardRefRenderFunction<
+  any,
+  ProFormFieldItemProps<RateProps>
+> = ({ fieldProps, proFieldProps, ...rest }, ref) => {
   return (
-    <ProField valueType="rate" mode="edit" fieldProps={fieldProps} ref={ref} {...proFieldProps} />
+    <ProField
+      valueType="rate"
+      fieldProps={fieldProps}
+      ref={ref}
+      proFieldProps={proFieldProps}
+      filedConfig={{
+        ignoreWidth: true,
+      }}
+      {...rest}
+    />
   );
 };
 
-export default createField<ProFormItemProps<RateProps>>(React.forwardRef(ProFormRate), {
-  ignoreWidth: true,
-});
+export default React.forwardRef(ProFormRate);

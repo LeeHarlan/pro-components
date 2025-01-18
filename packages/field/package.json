@@ -1,26 +1,27 @@
 {
   "name": "@ant-design/pro-field",
-  "version": "1.15.4",
+  "version": "3.0.1",
   "description": "原子信息组件，统一 ProForm、ProTable、ProList、Filter 等组件里面的字段定义。",
   "homepage": "https://github.com/ant-design/pro-components/tree/master/packages/plugin-layout#readme",
   "bugs": "https://github.com/ant-design/pro-components/issues",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ant-design/pro-components"
+    "url": "git+https://github.com/ant-design/pro-components.git"
   },
   "license": "MIT",
   "author": "chenshuai2144",
-  "sideEffects": [
-    "*.less"
-  ],
+  "sideEffects": false,
   "main": "lib/index.js",
   "module": "es/index.js",
-  "types": "lib/index.d.ts",
+  "types": "es/index.d.ts",
   "files": [
-    "lib",
     "es",
-    "dist"
+    "dist",
+    "lib"
   ],
+  "scripts": {
+    "build": "father build"
+  },
   "browserslist": [
     "last 2 versions",
     "Firefox ESR",
@@ -28,24 +29,27 @@
     "ie >= 11"
   ],
   "dependencies": {
-    "@ant-design/icons": "^4.2.1",
-    "@ant-design/pro-provider": "1.4.11",
-    "@ant-design/pro-utils": "1.16.3",
-    "classnames": "^2.2.6",
-    "lodash.tonumber": "^4.0.3",
-    "moment": "^2.27.0",
-    "omit.js": "^2.0.2",
+    "@ant-design/icons": "^5.0.0",
+    "@ant-design/pro-provider": "2.15.3",
+    "@ant-design/pro-utils": "2.16.3",
+    "@babel/runtime": "^7.18.0",
+    "@chenshuai2144/sketch-color": "^1.0.8",
+    "classnames": "^2.3.2",
+    "dayjs": "^1.11.10",
+    "lodash": "^4.17.21",
+    "lodash-es": "^4.17.21",
     "rc-util": "^5.4.0",
-    "react-color": "2.19.3",
-    "swr": "^0.3.6"
+    "swr": "^2.0.0"
   },
   "devDependencies": {
-    "@types/classnames": "^2.2.10",
-    "@types/lodash.tonumber": "^4.0.6",
-    "@types/react-color": "^3.0.4"
+    "@types/lodash": "^4.17.10",
+    "@types/lodash-es": "^4.17.12",
+    "@types/react-color": "^3.0.4",
+    "rc-resize-observer": "^0.2.3",
+    "typescript": "^5.0.4"
   },
   "peerDependencies": {
-    "antd": "4.x",
-    "react": ">=16.9.0"
+    "antd": "^4.24.15 || ^5.11.2",
+    "react": ">=17.0.0"
   }
 }

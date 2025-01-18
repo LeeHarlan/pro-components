@@ -1,168 +1,123 @@
-﻿import React, { useEffect, useState } from 'react';
-import { Form, Popover, Progress, Space } from 'antd';
-import type { FormItemProps, PopoverProps, ProgressProps, FormInstance } from 'antd';
-import { CheckCircleFilled, CloseCircleFilled, LoadingOutlined } from '@ant-design/icons';
-import type { Rule, NamePath, RuleObject } from 'rc-field-form/lib/interface';
-
-const RED = '#ff4d4f';
-const YELLOW = '#faad14';
-const GREEN = '#52c41a';
-const PRIMARY = '#1890ff';
-const COLORS = { RED, YELLOW, GREEN, PRIMARY };
-
-const getStrokeColor = (percent: number) => {
-  if (percent < 50) {
-    return COLORS.RED;
-  }
-  if (percent < 100) {
-    return COLORS.YELLOW;
-  }
-  return COLORS.GREEN;
-};
-
-const CircleRender = () => {
-  return (
-    <div
-      style={{
-        width: 14,
-        height: 22,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <div
-        style={{
-          width: '6px',
-          height: '6px',
-          borderRadius: '4px',
-          backgroundColor: 'rgba(0,0,0,0.45)',
-        }}
-      />
-    </div>
-  );
-};
-
-const getIcon = (
-  fieldError: string[],
-  rule: Rule,
-  isTouched: boolean,
-  requiredChecked: boolean,
-) => {
-  if (!isTouched) {
-    return <CircleRender></CircleRender>;
-  }
-  if (!requiredChecked) {
-    return <CloseCircleFilled style={{ color: COLORS.RED }} />;
-  }
-  if (fieldError.includes((rule as any).message)) {
-    return <CloseCircleFilled style={{ color: COLORS.RED }} />;
-  }
-  return <CheckCircleFilled style={{ color: COLORS.GREEN }} />;
-};
-
-const Content: React.FC<{
-  fieldError: string[];
-  value: any;
-  isValidating: boolean;
-  isTouched: boolean;
-  rules: Rule[];
-  progressProps?: ProgressProps | false;
-}> = ({ rules, isTouched, isValidating, value, fieldError, progressProps }) => {
-  const percent = Math.max(
-    0,
-    Math.min(100, ((rules.length - fieldError.length) / rules.length) * 100),
-  );
-  const isSingleRule = rules.length === 1;
-  const requiredRule = rules.filter((_) => (_ as RuleObject).required)[0] as RuleObject;
-  const hasRequired = !!requiredRule;
-  const requiredChecked = hasRequired && !fieldError.includes(requiredRule?.message as string);
-  return (
-    <div style={isSingleRule ? {} : { padding: '6px 8px 12px 8px' }}>
-      {(progressProps === undefined || progressProps) && (
-        <Progress
-          percent={value && isTouched ? percent : 0}
-          strokeColor={getStrokeColor(percent)}
-          showInfo={false}
-          size="small"
-          strokeLinecap={'butt'}
-          {...progressProps}
-        />
-      )}
-      <ul
-        style={
-          isSingleRule
-            ? { margin: 0, padding: 0, listStyle: 'none' }
-            : { margin: 0, marginTop: '10px', listStyle: 'none', padding: '0' }
-        }
-      >
-        {rules?.map((rule, idx) => (
-          <li key={idx} style={{ display: 'flex', alignItems: 'center' }}>
-            <Space>
-              {isValidating ? (
-                <LoadingOutlined style={{ color: COLORS.PRIMARY }} />
-              ) : (
-                getIcon(fieldError, rule, isTouched, hasRequired ? requiredChecked : true)
-              )}
-              <span style={{ color: 'rgba(0,0,0,0.65)' }}>{(rule as any).message}</span>
-            </Space>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-};
+﻿import { LoadingOutlined } from '@ant-design/icons';
+import { useToken } from '@ant-design/pro-provider';
+import type { FormItemProps, PopoverProps } from 'antd';
+import { ConfigProvider, Form, Popover } from 'antd';
+import type { NamePath } from 'rc-field-form/lib/interface';
+import get from 'rc-util/lib/utils/get';
+import React, { useContext, useEffect, useState } from 'react';
+import { openVisibleCompatible } from '../../compareVersions/openVisibleCompatible';
+import { useStyle } from './style';
 
 interface InlineErrorFormItemProps extends FormItemProps {
   errorType?: 'popover' | 'default';
   popoverProps?: PopoverProps;
-  progressProps?: ProgressProps | false;
+  children: any;
 }
 
 interface InternalProps extends InlineErrorFormItemProps {
   name: NamePath;
-  rules: Rule[];
+  rules: FormItemProps['rules'];
+  children: any;
 }
 
 const FIX_INLINE_STYLE = {
-  marginTop: -5,
-  marginBottom: -5,
-  marginLeft: 0,
-  marginRight: 0,
+  marginBlockStart: -5,
+  marginBlockEnd: -5,
+  marginInlineStart: 0,
+  marginInlineEnd: 0,
 };
 
-const InternalFormItem: React.FC<
-  InternalProps & {
-    form: Omit<FormInstance, 'scrollToField' | '__INTERNAL__' | 'getFieldInstance'>;
-  }
-> = ({ label, rules, name, children, popoverProps, progressProps, form, ...rest }) => {
-  const fieldError = form.getFieldError(name);
-  const value = form.getFieldValue(name);
-  const isValidating = form.isFieldValidating(name);
-  const isTouched = form.isFieldTouched(name);
+const InlineErrorFormItemPopover: React.FC<{
+  inputProps: any;
+  input: JSX.Element;
+  errorList: JSX.Element;
+  extra: JSX.Element;
+  popoverProps?: PopoverProps;
+}> = ({ inputProps, input, extra, errorList, popoverProps }) => {
+  const [open, setOpen] = useState<boolean | undefined>(false);
+  const [errorStringList, setErrorList] = useState<string[]>([]);
+  const { getPrefixCls } = useContext(ConfigProvider.ConfigContext);
+  const prefixCls = getPrefixCls();
 
-  const [visible, setVisible] = useState<boolean | undefined>(undefined);
-
+  const token = useToken();
+  const { wrapSSR, hashId } = useStyle(`${prefixCls}-form-item-with-help`);
   useEffect(() => {
-    if (!isTouched) {
-      return;
+    if (inputProps.validateStatus !== 'validating') {
+      setErrorList(inputProps.errors);
     }
-    if (!isValidating) {
-      if (fieldError.length) {
-        setVisible(true);
-      } else {
-        setVisible(false);
-      }
-    }
-  }, [isValidating, fieldError.length]);
+  }, [inputProps.errors, inputProps.validateStatus]);
+
+  const popoverOpenProps = openVisibleCompatible(
+    errorStringList.length < 1 ? false : open,
+    (changeOpen: boolean) => {
+      if (changeOpen === open) return;
+      setOpen(changeOpen);
+    },
+  );
+
+  const loading = inputProps.validateStatus === 'validating';
 
   return (
+    <Popover
+      key="popover"
+      trigger={popoverProps?.trigger || ['click']}
+      placement={popoverProps?.placement || 'topLeft'}
+      {...popoverOpenProps}
+      getPopupContainer={popoverProps?.getPopupContainer}
+      getTooltipContainer={popoverProps?.getTooltipContainer}
+      content={wrapSSR(
+        <div
+          className={`${prefixCls}-form-item ${hashId} ${token.hashId}`.trim()}
+          style={{
+            margin: 0,
+            padding: 0,
+          }}
+        >
+          <div
+            className={`${prefixCls}-form-item-with-help ${hashId} ${token.hashId}`.trim()}
+          >
+            {loading ? <LoadingOutlined /> : null}
+            {errorList}
+          </div>
+        </div>,
+      )}
+      {...popoverProps}
+    >
+      <>
+        {input}
+        {extra}
+      </>
+    </Popover>
+  );
+};
+
+const InternalFormItemFunction: React.FC<InternalProps & FormItemProps> = ({
+  rules,
+  name,
+  children,
+  popoverProps,
+  ...rest
+}) => {
+  return (
     <Form.Item
-      style={FIX_INLINE_STYLE}
-      preserve={false}
       name={name}
-      validateFirst={false}
       rules={rules}
+      hasFeedback={false}
+      shouldUpdate={(prev, next) => {
+        if (prev === next) return false;
+        const shouldName = [name].flat(1);
+        if (shouldName.length > 1) {
+          shouldName.pop();
+        }
+        try {
+          return (
+            JSON.stringify(get(prev, shouldName)) !==
+            JSON.stringify(get(next, shouldName))
+          );
+        } catch (error) {
+          return true;
+        }
+      }}
       // @ts-ignore
       _internalItemRender={{
         mark: 'pro_table_render',
@@ -170,73 +125,71 @@ const InternalFormItem: React.FC<
           inputProps: FormItemProps & {
             errors: any[];
           },
-          {
-            input,
-            extra,
-          }: {
+          doms: {
             input: JSX.Element;
             errorList: JSX.Element;
             extra: JSX.Element;
           },
-        ) => {
-          return (
-            <Popover
-              trigger={popoverProps?.trigger || 'focus'}
-              placement={popoverProps?.placement}
-              visible={visible}
-              content={
-                <Content
-                  fieldError={fieldError}
-                  value={value}
-                  isValidating={isValidating}
-                  isTouched={isTouched}
-                  rules={rules}
-                  progressProps={progressProps}
-                />
-              }
-            >
-              <div>
-                {input}
-                {extra}
-              </div>
-            </Popover>
-          );
-        },
+        ) => (
+          <InlineErrorFormItemPopover
+            inputProps={inputProps}
+            popoverProps={popoverProps}
+            {...doms}
+          />
+        ),
       }}
       {...rest}
+      style={{
+        ...FIX_INLINE_STYLE,
+        ...rest?.style,
+      }}
     >
       {children}
     </Form.Item>
   );
 };
 
-const InlineErrorFormItem: React.FC<InternalProps> = (props) => {
-  return (
-    <Form.Item shouldUpdate={true} noStyle>
-      {(form) => {
-        return <InternalFormItem {...props} form={form}></InternalFormItem>;
-      }}
-    </Form.Item>
-  );
-};
+export const InlineErrorFormItem = (props: InlineErrorFormItemProps) => {
+  const { errorType, rules, name, popoverProps, children, ...rest } = props;
 
-export default (props: InlineErrorFormItemProps) => {
-  const { errorType, rules, name, popoverProps, children, progressProps, ...rest } = props;
   if (name && rules?.length && errorType === 'popover') {
     return (
-      <InlineErrorFormItem
+      <InternalFormItemFunction
         name={name}
         rules={rules!}
         popoverProps={popoverProps}
-        progressProps={rules.length > 1 ? progressProps : false}
         {...rest}
       >
         {children}
-      </InlineErrorFormItem>
+      </InternalFormItemFunction>
     );
   }
   return (
-    <Form.Item rules={rules} {...rest} style={{ ...FIX_INLINE_STYLE, ...rest.style }} name={name}>
+    <Form.Item
+      rules={rules}
+      shouldUpdate={
+        name
+          ? (prev, next) => {
+              if (prev === next) return false;
+              const shouldName = [name].flat(1);
+              if (shouldName.length > 1) {
+                shouldName.pop();
+              }
+              try {
+                return (
+                  JSON.stringify(get(prev, shouldName)) !==
+                  JSON.stringify(get(next, shouldName))
+                );
+              } catch (error) {
+                return true;
+              }
+            }
+          : undefined
+      }
+      {...rest}
+      style={{ ...FIX_INLINE_STYLE, ...rest.style }}
+      name={name}
+    >
       {children}
     </Form.Item>
   );

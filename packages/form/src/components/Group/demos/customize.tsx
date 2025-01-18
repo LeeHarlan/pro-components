@@ -1,24 +1,25 @@
 ﻿/* eslint-disable no-param-reassign */
-import React, { useState } from 'react';
-import ProForm, {
-  ProFormList,
-  ProFormDependency,
-  ProFormSwitch,
-  ProFormText,
-  ProFormSelect,
-} from '@ant-design/pro-form';
-import ProField from '@ant-design/pro-field';
-import ProCard from '@ant-design/pro-card';
 import {
+  CopyOutlined,
+  DeleteOutlined,
   HeartOutlined,
   HomeOutlined,
+  PlusOutlined,
   SettingFilled,
   SmileOutlined,
   SyncOutlined,
-  PlusOutlined,
-  DeleteOutlined,
-  CopyOutlined,
 } from '@ant-design/icons';
+import {
+  ProCard,
+  ProForm,
+  ProFormDependency,
+  ProFormField,
+  ProFormList,
+  ProFormSelect,
+  ProFormSwitch,
+  ProFormText,
+} from '@ant-design/pro-components';
+import { useState } from 'react';
 
 const IconMap = {
   PlusOutlined,
@@ -34,12 +35,12 @@ const initialValue = {
   copyIconProps: {
     show: true,
     Icon: 'CopyOutlined',
-    tooltipText: '复制此行',
+    tooltipText: '复制此项',
   },
   deleteIconProps: {
     show: true,
     Icon: 'DeleteOutlined',
-    tooltipText: '删除此行',
+    tooltipText: '删除此项',
   },
   creatorButtonProps: {
     show: true,
@@ -69,7 +70,7 @@ const Demo = () => {
             }}
             {...stateValue}
           >
-            <ProForm.Group size={8}>
+            <ProForm.Group key="group" size={8}>
               <ProFormText name="name" label="姓名" />
               <ProFormText name="nickName" label="姓名" />
             </ProForm.Group>
@@ -99,14 +100,17 @@ const Demo = () => {
             setJson(JSON.stringify(values));
 
             if (values?.copyIconProps?.Icon) {
-              values.copyIconProps.Icon = IconMap[values?.copyIconProps?.Icon];
+              values.copyIconProps.Icon =
+                IconMap[values?.copyIconProps?.Icon as 'PlusOutlined'];
             }
 
             if (values?.deleteIconProps?.Icon) {
-              values.deleteIconProps.Icon = IconMap[values?.deleteIconProps?.Icon];
+              values.deleteIconProps.Icon =
+                IconMap[values?.deleteIconProps?.Icon as 'PlusOutlined'];
             }
             if (values?.creatorButtonProps?.icon) {
-              const Icon = IconMap[values?.creatorButtonProps?.icon];
+              const Icon =
+                IconMap[values?.creatorButtonProps?.icon as 'PlusOutlined'];
               values.creatorButtonProps.icon = <Icon />;
             }
             setStateValue(values);
@@ -142,7 +146,7 @@ const Demo = () => {
                       label="图标"
                       request={async () => {
                         return Object.keys(IconMap).map((value) => {
-                          const Icon = IconMap[value];
+                          const Icon = IconMap[value as 'PlusOutlined'];
                           return {
                             label: <Icon />,
                             value,
@@ -168,14 +172,19 @@ const Demo = () => {
                       name={['creatorButtonProps', 'type']}
                       label="按钮类型"
                       request={async () => {
-                        return ['default', 'primary', 'ghost', 'dashed', 'link', 'text'].map(
-                          (value) => {
-                            return {
-                              label: value,
-                              value,
-                            };
-                          },
-                        );
+                        return [
+                          'default',
+                          'primary',
+                          'ghost',
+                          'dashed',
+                          'link',
+                          'text',
+                        ].map((value) => {
+                          return {
+                            label: value,
+                            value,
+                          };
+                        });
                       }}
                     />
                   </ProForm.Group>
@@ -214,7 +223,7 @@ const Demo = () => {
                       label="图标"
                       request={async () => {
                         return Object.keys(IconMap).map((value) => {
-                          const Icon = IconMap[value];
+                          const Icon = IconMap[value as 'PlusOutlined'];
                           return {
                             label: <Icon />,
                             value,
@@ -257,7 +266,7 @@ const Demo = () => {
                       label="图标"
                       request={async () => {
                         return Object.keys(IconMap).map((value) => {
-                          const Icon = IconMap[value];
+                          const Icon = IconMap[value as 'PlusOutlined'];
                           return {
                             label: <Icon />,
                             value,
@@ -270,7 +279,12 @@ const Demo = () => {
               }}
             </ProFormDependency>
           </ProForm.Group>
-          <ProField valueType="jsonCode" text={json} mode="read" />
+          <ProFormField
+            ignoreFormItem
+            valueType="jsonCode"
+            text={json}
+            mode="read"
+          />
         </ProForm>
       </ProCard>
     </ProCard>

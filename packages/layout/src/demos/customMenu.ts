@@ -1,12 +1,12 @@
 export default [
   {
     path: '/',
-    name: 'welcome',
-    children: [
+    name: '欢迎',
+    routes: [
       {
         path: '/welcome',
         name: 'one',
-        children: [
+        routes: [
           {
             path: '/welcome/welcome',
             name: 'two',
@@ -18,6 +18,6 @@ export default [
   },
   {
     path: '/demo',
-    name: 'demo',
+    name: '例子',
   },
 ];

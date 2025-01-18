@@ -53,4 +53,19 @@ export default {
     prev: 'Sebelumnya',
     submit: 'Selesai',
   },
+  loginForm: {
+    submitText: 'Login',
+  },
+  editableTable: {
+    action: {
+      save: 'simpan',
+      cancel: 'batal',
+      delete: 'hapus',
+      add: 'Tambahkan baris data',
+    },
+  },
+  switch: {
+    open: 'buka',
+    close: 'tutup',
+  },
 };

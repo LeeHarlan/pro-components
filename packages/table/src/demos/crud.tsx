@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, Tabs, Tag, Space, message } from 'antd';
-import type { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
-import ProDescriptions from '@ant-design/pro-descriptions';
-import type { ProColumns } from '@ant-design/pro-table';
-import ProTable, { TableDropdown } from '@ant-design/pro-table';
+import type {
+  ProColumns,
+  ProDescriptionsItemProps,
+} from '@ant-design/pro-components';
+import {
+  ProCard,
+  ProDescriptions,
+  ProTable,
+  TableDropdown,
+} from '@ant-design/pro-components';
+import { Button, Space, Tabs, Tag, message } from 'antd';
+import { useState } from 'react';
 import request from 'umi-request';
 
 type GithubIssueItem = {
@@ -85,12 +91,6 @@ const columns: ProColumns<GithubIssueItem>[] = [
     ),
   },
   {
-    title: '创建时间',
-    key: 'since',
-    dataIndex: 'created_at',
-    valueType: 'dateTime',
-  },
-  {
     title: 'option',
     valueType: 'option',
     dataIndex: 'id',
@@ -113,7 +113,7 @@ const columns: ProColumns<GithubIssueItem>[] = [
 export default () => {
   const [type, setType] = useState('table');
   return (
-    <>
+    <ProCard>
       <Tabs activeKey={type} onChange={(e) => setType(e)}>
         <Tabs.TabPane tab="table" key="table" />
         <Tabs.TabPane tab="form" key="form" />
@@ -123,7 +123,7 @@ export default () => {
         <ProTable<GithubIssueItem>
           columns={columns}
           type={type as 'table'}
-          request={async (params = {}) =>
+          request={async (params = {} as Record<string, any>) =>
             request<{
               data: GithubIssueItem[];
             }>('https://proapi.azurewebsites.net/github/issues', {
@@ -163,6 +163,6 @@ export default () => {
           }}
         />
       )}
-    </>
+    </ProCard>
   );
 };

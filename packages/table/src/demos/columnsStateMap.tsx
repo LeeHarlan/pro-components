@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import type { ProColumns, ColumnsState } from '@ant-design/pro-table';
-import ProTable from '@ant-design/pro-table';
+import type { ColumnsState, ProColumns } from '@ant-design/pro-components';
+import { ProTable } from '@ant-design/pro-components';
+import { useState } from 'react';
 
 const valueEnum = {
   0: 'close',
@@ -23,7 +23,7 @@ for (let i = 0; i < 2; i += 1) {
   tableListDataSource.push({
     key: i,
     name: `TradeCode ${i}`,
-    status: valueEnum[Math.floor(Math.random() * 10) % 4],
+    status: valueEnum[((Math.floor(Math.random() * 10) % 4) + '') as '0'],
     updatedAt: Date.now() - Math.floor(Math.random() * 1000),
     createdAt: Date.now() - Math.floor(Math.random() * 2000),
     money: Math.floor(Math.random() * 2000) * i,
@@ -52,12 +52,6 @@ const columns: ProColumns<TableListItem>[] = [
     },
   },
   {
-    title: '创建时间',
-    key: 'since',
-    dataIndex: 'createdAt',
-    valueType: 'dateTime',
-  },
-  {
     title: '更新时间',
     key: 'since2',
     dataIndex: 'createdAt',
@@ -75,7 +69,9 @@ const columns: ProColumns<TableListItem>[] = [
 ];
 
 export default () => {
-  const [columnsStateMap, setColumnsStateMap] = useState<Record<string, ColumnsState>>({
+  const [columnsStateMap, setColumnsStateMap] = useState<
+    Record<string, ColumnsState>
+  >({
     name: {
       show: false,
       order: 2,
@@ -90,7 +86,10 @@ export default () => {
             if (!params?.keyWord) {
               return true;
             }
-            if (item.name.includes(params?.keyWord) || item.status.includes(params?.keyWord)) {
+            if (
+              item.name.includes(params?.keyWord) ||
+              item.status.includes(params?.keyWord)
+            ) {
               return true;
             }
             return false;
@@ -102,8 +101,10 @@ export default () => {
         search: true,
       }}
       rowKey="key"
-      columnsStateMap={columnsStateMap}
-      onColumnsStateChange={(map) => setColumnsStateMap(map)}
+      columnsState={{
+        value: columnsStateMap,
+        onChange: setColumnsStateMap,
+      }}
       search={false}
       dateFormatter="string"
       headerTitle="受控模式"

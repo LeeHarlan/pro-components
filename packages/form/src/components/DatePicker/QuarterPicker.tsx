@@ -1,31 +1,35 @@
-import React from 'react';
-import ProField from '@ant-design/pro-field';
 import type { DatePickerProps } from 'antd';
-import createField from '../../BaseForm/createField';
-import type { ProFormItemProps } from '../../interface';
+import React, { useContext } from 'react';
+import FieldContext from '../../FieldContext';
+import type { ProFormFieldItemProps } from '../../typing';
+import ProField from '../Field';
 
-const valueType = 'dateQuarter';
+const valueType = 'dateQuarter' as const;
 /**
  * 周选择组件
  *
  * @param
  */
-const ProFormDatePickerQuarter: React.FC<ProFormItemProps<DatePickerProps>> = React.forwardRef(
-  ({ proFieldProps, fieldProps }, ref: any) => {
-    return (
-      <ProField
-        ref={ref}
-        text={fieldProps?.value}
-        mode="edit"
-        valueType={valueType}
-        fieldProps={fieldProps}
-        {...proFieldProps}
-      />
-    );
-  },
-);
+const ProFormDatePickerQuarter: React.FC<
+  ProFormFieldItemProps<DatePickerProps>
+> = React.forwardRef(({ fieldProps, ...rest }, ref: any) => {
+  const context = useContext(FieldContext);
 
-export default createField<ProFormItemProps<DatePickerProps>>(ProFormDatePickerQuarter, {
-  valueType,
-  customLightMode: true,
+  return (
+    <ProField
+      ref={ref}
+      valueType={valueType}
+      fieldProps={{
+        getPopupContainer: context.getPopupContainer,
+        ...fieldProps,
+      }}
+      filedConfig={{
+        valueType,
+        customLightMode: true,
+      }}
+      {...rest}
+    />
+  );
 });
+
+export default ProFormDatePickerQuarter;

@@ -1,8 +1,7 @@
-import React, { useRef, useState } from 'react';
-import type { FormInstance } from 'antd';
+import type { ProColumns, ProFormInstance } from '@ant-design/pro-components';
+import { ProTable } from '@ant-design/pro-components';
 import { Button } from 'antd';
-import type { ProColumns } from '@ant-design/pro-table';
-import ProTable from '@ant-design/pro-table';
+import { useRef, useState } from 'react';
 
 export type TableListItem = {
   key: number;
@@ -19,12 +18,12 @@ const columns: ProColumns<TableListItem>[] = [
     title: '创建时间',
     key: 'since',
     dataIndex: 'createdAt',
-    valueType: 'dateTime',
+    valueType: 'date',
   },
 ];
 
 export default () => {
-  const ref = useRef<FormInstance>();
+  const ref = useRef<ProFormInstance>();
   const [collapsed, setCollapsed] = useState(false);
 
   return (

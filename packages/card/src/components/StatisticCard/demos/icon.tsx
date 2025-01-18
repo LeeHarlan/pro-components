@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { StatisticCard } from '@ant-design/pro-card';
+import { StatisticCard } from '@ant-design/pro-components';
 import RcResizeObserver from 'rc-resize-observer';
+import { useState } from 'react';
 
 const imgStyle = {
   display: 'block',
@@ -15,10 +15,10 @@ export default () => {
     <RcResizeObserver
       key="resize-observer"
       onResize={(offset) => {
-        setResponsive(offset.width < 640);
+        setResponsive(offset.width < 596);
       }}
     >
-      <StatisticCard.Group direction={responsive ? 'column' : undefined}>
+      <StatisticCard.Group direction={responsive ? 'column' : 'row'}>
         <StatisticCard
           statistic={{
             title: '支付金额',
@@ -47,7 +47,7 @@ export default () => {
         />
         <StatisticCard
           statistic={{
-            title: '支付成功订单数',
+            title: '成功订单数',
             value: 87,
             icon: (
               <img

@@ -1,5 +1,7 @@
 export default {
-  moneySymbol: '￥',
+  moneySymbol: '¥',
+  deleteThisLine: '删除此项',
+  copyThisLine: '复制此项',
   form: {
     lightFilter: {
       more: '更多筛选',
@@ -44,15 +46,29 @@ export default {
     reload: '刷新',
     density: '密度',
     densityDefault: '正常',
-    densityLarger: '默认',
+    densityLarger: '宽松',
     densityMiddle: '中等',
     densitySmall: '紧凑',
   },
+  stepsForm: {
+    next: '下一步',
+    prev: '上一步',
+    submit: '提交',
+  },
+  loginForm: {
+    submitText: '登录',
+  },
   editableTable: {
+    onlyOneLineEditor: '只能同时编辑一行',
     action: {
       save: '保存',
       cancel: '取消',
       delete: '删除',
+      add: '添加一行数据',
     },
+  },
+  switch: {
+    open: '打开',
+    close: '关闭',
   },
 };

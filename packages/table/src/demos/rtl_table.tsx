@@ -1,11 +1,10 @@
-import React, { useRef } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, Tag, Space, ConfigProvider } from 'antd';
-import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import ProTable, { TableDropdown } from '@ant-design/pro-table';
-import request from 'umi-request';
-
+import type { ActionType, ProColumns } from '@ant-design/pro-components';
+import { ProTable, TableDropdown } from '@ant-design/pro-components';
+import { Button, ConfigProvider, Space, Tag } from 'antd';
 import arEGIntl from 'antd/lib/locale/ar_EG';
+import { useRef } from 'react';
+import request from 'umi-request';
 
 type GithubIssueItem = {
   url: string;
@@ -34,7 +33,7 @@ const columns: ProColumns<GithubIssueItem>[] = [
     dataIndex: 'title',
     copyable: true,
     ellipsis: true,
-    tip: 'سيتم تقليص العنوان في حال كان طويل جدًا',
+    tooltip: 'سيتم تقليص العنوان في حال كان طويل جدًا',
     formItemProps: {
       rules: [
         {
@@ -82,12 +81,6 @@ const columns: ProColumns<GithubIssueItem>[] = [
     ),
   },
   {
-    title: 'تاريخ الإنشاء',
-    key: 'since',
-    dataIndex: 'created_at',
-    valueType: 'date',
-  },
-  {
     title: 'التشغيل',
     valueType: 'option',
     render: (text, record, _, action) => [
@@ -117,7 +110,7 @@ export default () => {
       <ProTable<GithubIssueItem>
         columns={columns}
         actionRef={actionRef}
-        request={async (params = {}) =>
+        request={async (params = {} as Record<string, any>) =>
           request<{
             data: GithubIssueItem[];
           }>('https://proapi.azurewebsites.net/github/issues', {

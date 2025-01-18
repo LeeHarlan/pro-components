@@ -1,17 +1,16 @@
-import React, { useRef } from 'react';
-
 import { SmileOutlined } from '@ant-design/icons';
-import ProForm, {
-  ProFormSwitch,
-  ProFormRadio,
+import {
+  ProForm,
   ProFormCheckbox,
-  ProFormUploadButton,
   ProFormField,
+  ProFormRadio,
   ProFormSlider,
+  ProFormSwitch,
+  ProFormUploadButton,
   ProFormUploadDragger,
-} from '@ant-design/pro-form';
-import LightWrapper from '../BaseForm/LightWrapper';
-import { Input } from 'antd';
+} from '@ant-design/pro-components';
+import { Button, Input } from 'antd';
+import { useRef } from 'react';
 
 const Demo = () => {
   const formRef = useRef();
@@ -49,13 +48,15 @@ const Demo = () => {
           showUploadList: true,
         }}
       />
-      <LightWrapper valuePropName="value">test</LightWrapper>
-      <LightWrapper valuePropName="value">test</LightWrapper>
       <ProFormSlider name="range" label="范围" />
       <ProFormField>test</ProFormField>
       <ProFormField>
         <Input />
       </ProFormField>
+      <ProForm.Item>
+        <Button>查看记录数</Button>
+        <span>共有200条</span>
+      </ProForm.Item>
     </ProForm>
   );
 };

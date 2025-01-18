@@ -1,6 +1,10 @@
-﻿import React from 'react';
-import ProForm, { ProFormGroup, ProFormList, ProFormText } from '@ant-design/pro-form';
-import ProCard from '@ant-design/pro-card';
+﻿import {
+  ProCard,
+  ProForm,
+  ProFormGroup,
+  ProFormList,
+  ProFormText,
+} from '@ant-design/pro-components';
 
 const Demo = () => {
   return (
@@ -21,7 +25,7 @@ const Demo = () => {
               extra={action}
               title={record?.name}
               style={{
-                marginBottom: 8,
+                marginBlockEnd: 8,
               }}
             >
               {listDom}
@@ -43,13 +47,13 @@ const Demo = () => {
             },
           ]}
           copyIconProps={{
-            tooltipText: '复制此行到末尾',
+            tooltipText: '复制此项到末尾',
           }}
           deleteIconProps={{
             tooltipText: '不需要这行了',
           }}
         >
-          <ProFormGroup>
+          <ProFormGroup key="group">
             <ProFormText name="value" label="值" />
             <ProFormText name="label" label="显示名称" />
           </ProFormGroup>

@@ -1,13 +1,23 @@
-import React from 'react';
-import type { SelectProps } from 'antd';
-import ProField from '@ant-design/pro-field';
-import type { ProSchema } from '@ant-design/pro-utils';
 import { runFunction } from '@ant-design/pro-utils';
-import type { ProFormItemProps } from '../../interface';
-import createField from '../../BaseForm/createField';
+import type { SelectProps } from 'antd';
+import type {
+  BaseOptionType,
+  DefaultOptionType,
+  RefSelectProps,
+} from 'antd/lib/select';
+import React, { useContext } from 'react';
+import FieldContext from '../../FieldContext';
+import type {
+  ProFormFieldItemProps,
+  ProFormFieldRemoteProps,
+} from '../../typing';
+import ProFormField from '../Field';
 
-export type ProFormSelectProps = ProFormItemProps<
-  SelectProps<any> & {
+export type ProFormSelectProps<
+  ValueType = any,
+  OptionType extends BaseOptionType | DefaultOptionType = DefaultOptionType,
+> = ProFormFieldItemProps<
+  SelectProps<ValueType, OptionType> & {
     /**
      * 是否在输入框聚焦时触发搜索
      *
@@ -20,51 +30,86 @@ export type ProFormSelectProps = ProFormItemProps<
      * @default false
      */
     resetAfterSelect?: boolean;
-  }
+    /**
+     * 当搜索关键词发生变化时是否请求远程数据
+     *
+     * @default true
+     */
+    fetchDataOnSearch?: boolean;
+    /** 自定义选项渲染 */
+    optionItemRender?: (item: ValueType) => React.ReactNode;
+  },
+  RefSelectProps
 > & {
-  valueEnum?: ProSchema['valueEnum'];
-  params?: ProSchema['params'];
-  request?: ProSchema['request'];
-  options?: SelectProps<any>['options'] | string[];
-  mode?: SelectProps<any>['mode'] | 'singe';
-  showSearch?: SelectProps<any>['showSearch'];
+  options?: SelectProps<ValueType, OptionType>['options'] | string[];
+  mode?: SelectProps<ValueType, OptionType>['mode'] | 'single';
+  showSearch?: SelectProps<ValueType, OptionType>['showSearch'];
   readonly?: boolean;
-};
+  onChange?: SelectProps<ValueType, OptionType>['onChange'];
+} & ProFormFieldRemoteProps;
 
 /**
  * 选择框
  *
  * @param
  */
-const ProFormSelectComponents = React.forwardRef<any, ProFormSelectProps>(
-  (
-    { fieldProps, children, params, proFieldProps, mode, valueEnum, request, showSearch, options },
-    ref,
-  ) => {
-    return (
-      <ProField
-        mode="edit"
-        valueEnum={runFunction(valueEnum)}
-        request={request}
-        params={params}
-        valueType="select"
-        fieldProps={{
+const ProFormSelectComponents = <T, OptionType extends BaseOptionType = any>(
+  {
+    fieldProps,
+    children,
+    params,
+    proFieldProps,
+    mode,
+    valueEnum,
+    request,
+    showSearch,
+    options,
+    ...rest
+  }: ProFormSelectProps<T, OptionType>,
+  ref: any,
+) => {
+  const context = useContext(FieldContext);
+
+  return (
+    <ProFormField<any>
+      valueEnum={runFunction(valueEnum)}
+      request={request}
+      params={params}
+      valueType="select"
+      filedConfig={{ customLightMode: true }}
+      fieldProps={
+        {
           options,
           mode,
           showSearch,
+          getPopupContainer: context.getPopupContainer,
           ...fieldProps,
-        }}
-        ref={ref}
-        {...proFieldProps}
-      >
-        {children}
-      </ProField>
-    );
-  },
-);
+        } as SelectProps<any>
+      }
+      ref={ref}
+      proFieldProps={proFieldProps}
+      {...rest}
+    >
+      {children}
+    </ProFormField>
+  );
+};
 
-const SearchSelect = React.forwardRef<any, ProFormSelectProps>(
-  ({ fieldProps, children, params, proFieldProps, mode, valueEnum, request, options }, ref) => {
+const SearchSelect = React.forwardRef<any, ProFormSelectProps<any>>(
+  (
+    {
+      fieldProps,
+      children,
+      params,
+      proFieldProps,
+      mode,
+      valueEnum,
+      request,
+      options,
+      ...rest
+    },
+    ref,
+  ) => {
     const props: Omit<SelectProps<any>, 'options'> & {
       options?: ProFormSelectProps['options'];
     } = {
@@ -72,37 +117,57 @@ const SearchSelect = React.forwardRef<any, ProFormSelectProps>(
       mode: (mode as 'multiple') || 'multiple',
       labelInValue: true,
       showSearch: true,
-      showArrow: false,
+      suffixIcon: null,
       autoClearSearchValue: true,
       optionLabelProp: 'label',
-      filterOption: false,
       ...fieldProps,
     };
+    const context = useContext(FieldContext);
     return (
-      <ProField
-        mode="edit"
+      <ProFormField<any>
         valueEnum={runFunction(valueEnum)}
         request={request}
         params={params}
         valueType="select"
-        fieldProps={props}
+        filedConfig={{ customLightMode: true }}
+        fieldProps={{ getPopupContainer: context.getPopupContainer, ...props }}
         ref={ref}
-        {...proFieldProps}
+        proFieldProps={proFieldProps}
+        {...rest}
       >
         {children}
-      </ProField>
+      </ProFormField>
     );
   },
 );
 
-const ProFormSelect = createField<ProFormSelectProps>(ProFormSelectComponents, {
-  customLightMode: true,
-}) as React.FunctionComponent<ProFormSelectProps> & {
-  SearchSelect: React.FunctionComponent<ProFormSelectProps>;
+const ProFormSelect = React.forwardRef(ProFormSelectComponents) as <
+  T,
+  OptionType extends BaseOptionType = any,
+>(
+  props: ProFormSelectProps<T, OptionType>,
+) => React.ReactElement;
+
+const ProFormSearchSelect = SearchSelect as <
+  T,
+  OptionType extends BaseOptionType = any,
+>(
+  props: ProFormSelectProps<T, OptionType>,
+) => React.ReactElement;
+
+const WrappedProFormSelect = ProFormSelect as (<
+  T,
+  OptionType extends BaseOptionType = any,
+>(
+  props: ProFormSelectProps<T, OptionType>,
+) => React.ReactElement) & {
+  SearchSelect: typeof ProFormSearchSelect;
 };
 
-ProFormSelect.SearchSelect = createField<ProFormSelectProps>(SearchSelect, {
-  customLightMode: true,
-}) as React.FunctionComponent<ProFormSelectProps>;
+WrappedProFormSelect.SearchSelect = ProFormSearchSelect;
 
-export default ProFormSelect;
+// @ts-ignore
+// eslint-disable-next-line no-param-reassign
+WrappedProFormSelect.displayName = 'ProFormComponent';
+
+export default WrappedProFormSelect;

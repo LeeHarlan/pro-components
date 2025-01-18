@@ -1,41 +1,38 @@
-import React, { useState } from 'react';
-import type { ProColumns } from '@ant-design/pro-table';
-import { EditableProTable } from '@ant-design/pro-table';
-import ProField from '@ant-design/pro-field';
-import ProCard from '@ant-design/pro-card';
+import type { ProColumns } from '@ant-design/pro-components';
+import {
+  EditableProTable,
+  ProCard,
+  ProFormField,
+} from '@ant-design/pro-components';
 import { Button } from 'antd';
+import React, { useState } from 'react';
 
 type DataSourceType = {
   id: React.Key;
   title?: string;
   decs?: string;
   state?: string;
-  created_at?: string;
+  created_at?: number;
   children?: DataSourceType[];
 };
 
-const defaultData: DataSourceType[] = [
-  {
-    id: 624748504,
-    title: '活动名称一',
+const defaultData: DataSourceType[] = new Array(20).fill(1).map((_, index) => {
+  return {
+    id: (Date.now() + index).toString(),
+    title: `活动名称${index}`,
     decs: '这个活动真好玩',
     state: 'open',
-    created_at: '2020-05-26T09:42:56Z',
-  },
-  {
-    id: 624691229,
-    title: '活动名称二',
-    decs: '这个活动真好玩',
-    state: 'closed',
-    created_at: '2020-05-26T08:19:22Z',
-  },
-];
+    created_at: 1590486176000,
+  };
+});
 
 export default () => {
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>(() =>
     defaultData.map((item) => item.id),
   );
-  const [dataSource, setDataSource] = useState<DataSourceType[]>(() => defaultData);
+  const [dataSource, setDataSource] = useState<readonly DataSourceType[]>(
+    () => defaultData,
+  );
 
   const columns: ProColumns<DataSourceType>[] = [
     {
@@ -48,6 +45,10 @@ export default () => {
             required: true,
             whitespace: true,
             message: '此项是必填项',
+          },
+          {
+            message: '必须包含数字',
+            pattern: /[0-9]/,
           },
           {
             max: 16,
@@ -99,6 +100,9 @@ export default () => {
         headerTitle="可编辑表格"
         columns={columns}
         rowKey="id"
+        scroll={{
+          x: 960,
+        }}
         value={dataSource}
         onChange={setDataSource}
         recordCreatorProps={{
@@ -134,7 +138,8 @@ export default () => {
         }}
       />
       <ProCard title="表格数据" headerBordered collapsible defaultCollapsed>
-        <ProField
+        <ProFormField
+          ignoreFormItem
           fieldProps={{
             style: {
               width: '100%',

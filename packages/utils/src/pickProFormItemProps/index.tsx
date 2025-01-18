@@ -26,13 +26,18 @@ const antdFormItemPropsList = [
   'valuePropName',
   'wrapperCol',
   'hidden',
+  // 我自定义的
+  'addonBefore',
+  'addonAfter',
+  'addonWarpStyle',
 ];
 
-export default function pickProFormItemProps(props: object) {
-  const attrs = {};
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function pickProFormItemProps(props: {}) {
+  const attrs = {} as Record<string, any>;
   antdFormItemPropsList.forEach((key) => {
-    if (props[key] !== undefined) {
-      attrs[key] = props[key];
+    if ((props as any)[key] !== undefined) {
+      attrs[key] = (props as any)[key];
     }
   });
   return attrs;

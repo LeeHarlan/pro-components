@@ -1,11 +1,9 @@
-import { mount } from 'enzyme';
-import React, { useContext } from 'react';
 import ProProvider from '@ant-design/pro-provider';
 import ProTable from '@ant-design/pro-table';
-import { act } from 'react-dom/test-utils';
+import { cleanup, render, waitFor } from '@testing-library/react';
 import { Input } from 'antd';
-
-import { waitForComponentToPaint } from '../util';
+import { act, useContext } from 'react';
+import { waitForWaitTime } from '../util';
 
 const Demo = () => {
   const values = useContext(ProProvider);
@@ -49,16 +47,20 @@ const Demo = () => {
   );
 };
 
+afterEach(() => {
+  cleanup();
+});
+
 describe('Table valueEnum', () => {
   it('🎏 dynamic enum test', async () => {
-    const html = mount(
+    const html = render(
       <ProTable
         size="small"
         columns={[
           {
             title: '状态',
             dataIndex: 'status',
-            hideInForm: true,
+            valueType: 'select',
             valueEnum: {},
             fieldProps: {
               open: true,
@@ -76,43 +78,110 @@ describe('Table valueEnum', () => {
         rowKey="key"
       />,
     );
-    await waitForComponentToPaint(html, 1200);
+    await waitFor(() => {
+      return html.findAllByText('2');
+    });
 
     act(() => {
-      html.setProps({
-        columns: [
-          {
-            title: '状态',
-            dataIndex: 'status',
-            hideInForm: true,
-            valueEnum: {
-              0: { text: '关闭', status: 'Default' },
-              1: { text: '运行中', status: 'Processing', disabled: true },
-              2: { text: '已上线', status: 'Success' },
-              3: { text: '异常', status: 'Error' },
+      html.rerender(
+        <ProTable
+          size="small"
+          request={async () => ({
+            data: [
+              {
+                status: 2,
+                key: '1',
+              },
+            ],
+          })}
+          rowKey="key"
+          columns={[
+            {
+              title: '状态',
+              valueType: 'select',
+              dataIndex: 'status',
+              valueEnum: {
+                0: { text: '关闭', status: 'Default' },
+                1: { text: '运行中', status: 'Processing', disabled: true },
+                2: { text: '已上线', status: 'Success' },
+                3: { text: '异常', status: 'Error' },
+              },
+              fieldProps: {
+                open: true,
+              },
             },
-            fieldProps: {
-              open: true,
-            },
-          },
-        ],
-      });
+          ]}
+        />,
+      );
     });
-    await waitForComponentToPaint(html, 200);
+
+    await waitFor(() => {
+      return html.findAllByText('已上线');
+    });
+
     act(() => {
-      html.find('form.ant-form div.ant-select').simulate('click');
+      html.baseElement
+        .querySelector<HTMLDivElement>('form.ant-form div.ant-select')
+        ?.click();
     });
     act(() => {
-      expect(html.find('div.ant-select-dropdown').render()).toMatchSnapshot();
+      expect(
+        html.baseElement.querySelector<HTMLDivElement>(
+          'div.ant-select-dropdown',
+        )?.textContent,
+      ).toBe('01关闭运行中已上线异常');
     });
-    expect(html.find('td.ant-table-cell').text()).toBe('已上线');
+
+    console.log(html.baseElement.querySelector('table')?.innerHTML);
+
+    expect(
+      html.baseElement.querySelector<HTMLDivElement>('td.ant-table-cell')
+        ?.textContent,
+    ).toBe('已上线');
   });
 
   it('🎏 customization valueType', async () => {
-    const html = mount(<Demo />);
-    await waitForComponentToPaint(html, 1200);
-    act(() => {
-      expect(html.render()).toMatchSnapshot();
+    const html = render(<Demo />);
+    await waitForWaitTime(1200);
+    expect(html.asFragment()).toMatchSnapshot();
+  });
+
+  it('🎏 dynamic request', async () => {
+    const request = vi.fn();
+    render(
+      <ProTable
+        size="small"
+        columns={[
+          {
+            title: '状态',
+            dataIndex: 'status',
+            valueType: 'select',
+            valueEnum: {},
+            fieldProps: {
+              open: true,
+            },
+            request: async (_, config) => {
+              request(config.record);
+              return [];
+            },
+          },
+        ]}
+        rowKey="key"
+        request={async () => {
+          return {
+            data: [
+              {
+                status: 2,
+                key: '1',
+              },
+            ],
+          };
+        }}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(request).toHaveBeenCalledTimes(1);
     });
   });
 });

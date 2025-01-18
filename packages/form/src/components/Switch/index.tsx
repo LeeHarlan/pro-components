@@ -1,10 +1,12 @@
-import React from 'react';
-import ProField from '@ant-design/pro-field';
 import type { SwitchProps } from 'antd';
-import createField from '../../BaseForm/createField';
-import type { ProFormItemProps } from '../../interface';
+import React from 'react';
+import type { ProFormFieldItemProps } from '../../typing';
+import ProField from '../Field';
 
-export type ProFormSwitchProps = ProFormItemProps<SwitchProps> & {
+export type ProFormSwitchProps = Omit<
+  ProFormFieldItemProps<SwitchProps, HTMLElement>,
+  'emptyText'
+> & {
   checkedChildren?: SwitchProps['checkedChildren'];
   unCheckedChildren?: SwitchProps['unCheckedChildren'];
 };
@@ -14,25 +16,30 @@ export type ProFormSwitchProps = ProFormItemProps<SwitchProps> & {
  * @en-us Single Choice Switch
  */
 const ProFormSwitch: React.FC<ProFormSwitchProps> = React.forwardRef(
-  ({ fieldProps, unCheckedChildren, checkedChildren, proFieldProps }, ref: any) => {
+  (
+    { fieldProps, unCheckedChildren, checkedChildren, proFieldProps, ...rest },
+    ref: any,
+  ) => {
     return (
       <ProField
         valueType="switch"
-        mode="edit"
         fieldProps={{
           unCheckedChildren,
           checkedChildren,
           ...fieldProps,
         }}
-        text={fieldProps?.checked}
         ref={ref}
-        {...proFieldProps}
+        valuePropName="checked"
+        proFieldProps={proFieldProps}
+        filedConfig={{
+          valuePropName: 'checked',
+          ignoreWidth: true,
+          customLightMode: true,
+        }}
+        {...rest}
       />
     );
   },
 );
 
-export default createField<ProFormSwitchProps>(ProFormSwitch, {
-  valuePropName: 'checked',
-  ignoreWidth: true,
-});
+export default ProFormSwitch;
